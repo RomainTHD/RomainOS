@@ -1,14 +1,37 @@
-; Pour avoir un OS bootable il faut un boot sector
-; Boot sector : les 512 premiers bytes du disque terminés par 0x55 0xaa
+; BIOS set en mode TTY
+mov ah, 0x0e
 
-; Jump @ current mem adress
-jmp $
+; Registre d'écriture set à 'A'
+mov al, 'A'
 
-; db 0 : On éctit un 0
-; On va répéter cette instruction jusqu'à 2 bytes avant la fin du boot sector
-; $$ : début de la section courante
-; Par déduction, ($ - $$) = taille du code précédent
-times 510-($-$$) db 0
+loop:
+    ; Interruption BIOS pour écrire le contenu de al
+    int 0x10
 
-; Écriture des 2 derniers bytes du boot sector
-db 0x55, 0xaa
+    ; Changement vers minuscule
+    add al, ('a' - 'A')
+    int 0x10
+
+    ; Compare al et 'z'
+    cmp al, 'z'
+
+    ; Check le flag d'égalité, si == alors jmp exit
+    je exit
+
+    ; Incrémente al et le passe en majuscule
+    sub al, ('a' - 'A' - 1)
+
+    jmp loop
+
+exit:
+    ; Jump à l'adresse de la ligne courante pour écraser le reste du disque avec des 0
+    jmp $
+
+    ; Écriture du boot sector (512 premiers bytes du disque terminés par 0x55 0xaa) pour booter l'OS
+    ; Répète "db 0" (écrit 0) jusqu'à 2 bytes avant la fin du boot sector
+    ; $$ : début de la section courante, adresse de la 1ère ligne
+    ; Par déduction, ($ - $$) = taille du code précédent
+    times 510-($-$$) db 0
+
+    ; Écriture des 2 derniers bytes du boot sector
+    db 0x55, 0xaa
