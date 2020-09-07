@@ -2,5 +2,4 @@
 *.bin
 *.bin.part
 *.bak
-*.pdf
 cmake-*
