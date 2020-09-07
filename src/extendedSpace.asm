@@ -55,6 +55,9 @@ startProtectedMode:
     mov [0xb8004], byte 's'
     mov [0xb8006], byte 't'
 
+    call detectCPUID
+    call detectLongMode
+
     ; Boucle infinie, fin
     jmp $
 
