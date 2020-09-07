@@ -9,14 +9,10 @@ mov bp, 0x7c00
 ; Stack pointer, current mem adress
 mov sp, bp
 
-; Charge l'adresse de testString dans bx = argument de printString
-mov bx, testString
-call printString
-
 call readDisk
 
-; Jump à l'adresse de la ligne courante pour écraser le reste du disque avec des 0
-jmp $
+; Jump aux secteurs suivants
+jmp PROGRAM_SPACE
 
 %include "diskRead.asm"
 %include "printString.asm"
