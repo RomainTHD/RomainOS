@@ -2,7 +2,7 @@
 PROGRAM_SPACE equ 0x7e00
 
 readDisk:
-    ; Configure le bus pour lire le disque
+    ; Configure le BIOS pour lire le disque
     mov ah, 0x02
 
     ; Pour que le BIOS sache où mettre la data en mémoire
