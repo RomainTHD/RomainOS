@@ -1,5 +1,6 @@
 .idea
-boot.bin
+*.bin
+*.bin.part
 *.bak
 *.pdf
 cmake-*
