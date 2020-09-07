@@ -4,6 +4,7 @@ jmp enterProtectedMode
 
 %include "printString.asm"
 %include "GDT.asm"
+%include "CPUID.asm"
 
 ; Passage au mode protégé, qui offre 4 Go de RAM, pas de segmentation de RAM,
 ; de la détection d'adresses invalides et des priorités de tâches (pour le kernel plus tard)
