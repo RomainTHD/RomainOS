@@ -4,8 +4,6 @@ jmp enterProtectedMode
 
 %include "printString.asm"
 %include "GDT.asm"
-%include "CPUID.asm"
-%include "paging.asm"
 
 ; Passage au mode protégé, qui offre 4 Go de RAM, pas de segmentation de RAM,
 ; de la détection d'adresses invalides et des priorités de tâches (pour le kernel plus tard)
@@ -37,6 +35,10 @@ enableA20:
     ret
 
 [bits 32]
+
+%include "CPUID.asm"
+%include "paging.asm"
+
 ; Flush le pipeline du CPU pour éviter d'exécuter une instruction en parallèle au changement vers 32 bits
 startProtectedMode:
     mov ax, dataSegment
@@ -59,6 +61,25 @@ startProtectedMode:
     call detectCPUID
     call detectLongMode
     call setIdentityPaging
+    call editGDT
+
+    jmp codeSegment:start64Bits
+
+[bits 64]
+
+start64Bits:
+    ; VRAM
+    mov edi, 0xb8000
+
+    ; Registre 64 bits seulement
+    ; 4 espaces, bg = 1 = white, fg = f = white
+    ; Clear screen
+    mov rax, 0x1f201f201f201f20
+
+    ; Lignes
+    mov ecx, 500
+
+    rep stosq
 
     ; Boucle infinie, fin
     jmp $

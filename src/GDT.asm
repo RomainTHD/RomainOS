@@ -56,7 +56,16 @@ gdt_end:
 gdt_descriptor:
     gdt_size:
         dw gdt_end - gdt_nullDesc - 1
-        dd gdt_nullDesc
+        dq gdt_nullDesc
 
 codeSegment equ gdt_codeSegmentDesc - gdt_nullDesc
 dataSegment equ gdt_dataSegmentDesc - gdt_nullDesc
+
+[bits 32]
+; Passe le GDT en 64 bits
+editGDT:
+    mov [gdt_codeSegmentDesc + 6], byte 10101111b
+    mov [gdt_dataSegmentDesc + 6], byte 10101111b
+    ret
+
+[bits 16]
