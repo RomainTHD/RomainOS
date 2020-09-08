@@ -1,29 +1,29 @@
 #!/bin/bash
 
-if [ -f ./bin/bootloader.bin ]; then
-    mv ./bin/bootloader.bin ./bin/bootloader.bin.bak
-fi
-
-if [ -f ./bin/bootloader.bin.part ]; then
-    rm ./bin/bootloader.bin.part
-fi
-
-if [ -f ./bin/extendedSpace.bin.part ]; then
-    rm ./bin/extendedSpace.bin.part
+if [ -f ./bin/RomainOS.bin ]; then
+    mv ./bin/RomainOS.bin ./bin/RomainOS.bin.bak
 fi
 
 cd ./src || exit
 
 echo "Compilation bootloader..."
-nasm ./bootloader.asm -f bin -o ../bin/bootloader.bin.part || exit
+nasm ./bootloader.asm -f bin -o ../bin/bootloader.bin || exit
 
 echo "Compilation secteurs suivants..."
-nasm ./extendedSpace.asm -f bin -o ../bin/extendedSpace.bin.part || exit
+nasm ./extendedSpace.asm -f elf64 -o ../bin/extendedSpace.o || exit
+
+gcc -ffreestanding -mno-red-zone -m64 -c "kernel.cpp" -o "../bin/kernel.o" || exit
+
+cd ../bin || exit
+
+ld -o ./kernel.tmp -Ttext 0x7e00 ./extendedSpace.o ./kernel.o || exit
+
+objcopy -O binary ./kernel.tmp ./kernel.bin
 
 cd ..
 
 echo "Fusion des fichiers binaires..."
-cat ./bin/bootloader.bin.part ./bin/extendedSpace.bin.part > ./bin/bootloader.bin || exit
+cat ./bin/bootloader.bin ./bin/kernel.bin > ./bin/RomainOS.bin || exit
 
 echo "Exécution bootloader..."
-qemu-system-x86_64 -drive format=raw,file=./bin/bootloader.bin
+qemu-system-x86_64 -drive format=raw,file=./bin/RomainOS.bin

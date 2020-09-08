@@ -1,8 +1,6 @@
-[org 0x7e00]
-
 jmp enterProtectedMode
 
-%include "printString.asm"
+; %include "printString.asm"
 %include "GDT.asm"
 
 ; Passage au mode protégé, qui offre 4 Go de RAM, pas de segmentation de RAM,
@@ -66,6 +64,8 @@ startProtectedMode:
     jmp codeSegment:start64Bits
 
 [bits 64]
+; Fonction C
+[extern _start]
 
 start64Bits:
     ; VRAM
@@ -80,6 +80,9 @@ start64Bits:
     mov ecx, 500
 
     rep stosq
+
+    ; Fonction C
+    call _start
 
     ; Boucle infinie, fin
     jmp $
