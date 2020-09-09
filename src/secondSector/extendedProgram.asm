@@ -50,12 +50,6 @@ startProtectedMode:
     ; mov ebp, 0x90000
     ; mov esp, ebp
 
-    ; Début de la VRAM
-    mov [0xb8000], byte 'T'
-    mov [0xb8002], byte 'e'
-    mov [0xb8004], byte 's'
-    mov [0xb8006], byte 't'
-
     call detectCPUID
     call detectLongMode
     call setIdentityPaging
