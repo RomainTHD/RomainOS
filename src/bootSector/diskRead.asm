@@ -1,5 +1,5 @@
 ; 512 bytes apres 0x7c00
-PROGRAM_SPACE equ 0x7e00
+PROGRAM_SPACE equ 0x8000
 
 readDisk:
     ; Configure le BIOS pour lire le disque

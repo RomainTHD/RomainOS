@@ -14,8 +14,8 @@ call readDisk
 ; Jump aux secteurs suivants
 jmp PROGRAM_SPACE
 
-%include "diskRead.asm"
 %include "printString.asm"
+%include "diskRead.asm"
 
 ; Écriture du boot sector (512 premiers bytes du disque terminés par 0x55 0xaa) pour booter l'OS
 ; Répète "db 0" (écrit 0) jusqu'à 2 bytes avant la fin du boot sector
