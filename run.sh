@@ -1,5 +1,7 @@
 #!/bin/bash
 
+export PATH="$HOME/opt/cross/bin:$PATH"
+
 if [ -f ./bin/RomainOS.bin ]; then
     mv ./bin/RomainOS.bin ./bin/RomainOS.bin.bak
 fi
@@ -12,11 +14,11 @@ nasm ./bootloader.asm -f bin -o ../bin/bootloader.bin || exit
 echo "Compilation secteurs suivants..."
 nasm ./extendedSpace.asm -f elf64 -o ../bin/extendedSpace.o || exit
 
-gcc -ffreestanding -mno-red-zone -m64 -c "kernel.cpp" -o "../bin/kernel.o" || exit
+x86_64-elf-gcc -ffreestanding -mno-red-zone -m64 -c "kernel.cpp" -o "../bin/kernel.o" || exit
 
 cd ../bin || exit
 
-ld -o ./kernel.tmp -Ttext 0x7e00 ./extendedSpace.o ./kernel.o || exit
+x86_64-elf-ld -o ./kernel.tmp -Ttext 0x7e00 ./extendedSpace.o ./kernel.o || exit
 
 objcopy -O binary ./kernel.tmp ./kernel.bin
 

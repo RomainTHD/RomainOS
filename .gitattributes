@@ -149,3 +149,8 @@ makefile          text
 
 # Ignore files (like .npmignore or .gitignore)
 *.*ignore         text
+
+
+
+GCC_Cross-Compiler/x86_64-elf-* binary
+GCC_Cross-Compiler/CREDITS text
