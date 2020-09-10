@@ -1,6 +1,6 @@
 # RomainOS
 
-Encore une idée à la con ça mais go faire un OS from scratch, non pas en 16 bits, ni en 32 bits, mais bien en 64 bits !
+Une idée à la con mais vlà mon OS, from scratch, en 64 bits, à base d'assembleur et de C++ !
 
 <img src="https://image.noelshack.com/fichiers/2016/24/1466366192-risitas8.png" />
 
