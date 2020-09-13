@@ -14,7 +14,7 @@ nasm ./extendedProgram.asm -f elf64 -o ../../bin/extendedProgram.o || exit
 
 echo "Compilation C/C++..."
 cd .. || exit
-"$HOME"/opt/cross/bin/x86_64-elf-gcc -Ttext 0x8000 -ffreestanding -mno-red-zone -m64 -c kernel.cpp -o ../bin/kernel.o || exit
+"$HOME"/opt/cross/bin/x86_64-elf-g++ -Ttext 0x8000 -ffreestanding -lstdc++ -mno-red-zone -m64 -c kernel.cpp -Wall -Wextra -pedantic -o ../bin/kernel.o || exit
 
 echo "Linker..."
 cd ../bin || exit
