@@ -6,6 +6,7 @@
 
 #include "types.hpp"
 #include "IO.hpp"
+#include "string.hpp"
 
 /**
  * Emplacement VRAM
@@ -23,9 +24,14 @@
 #define VGA_HEIGHT 25
 
 /**
+ * Largeur d'un tab
+ */
+#define TAB_LENGTH 4
+
+/**
  * Position du curseur
  */
-u16 cursorPosition;
+u16 cursorPosition = 0;
 
 /**
  * Set la position du curseur
@@ -43,6 +49,12 @@ void setCursorPosition(u16 pos) {
     cursorPosition = pos;
 }
 
+/**
+ * Set la position du curseur
+ *
+ * @param row Ligne, -1 = dernière ligne, -2 = avant-dernière, etc
+ * @param col Colonne, -1 = dernière colonne, -2 = avant-dernière, etc
+ */
 void setCursorPosition(i16 row, i16 col) {
     if (row < 0) {
         row = (row + VGA_HEIGHT) % VGA_HEIGHT;
@@ -53,6 +65,43 @@ void setCursorPosition(i16 row, i16 col) {
     }
 
     setCursorPosition(VGA_WIDTH*row + col);
+}
+
+/**
+ * Affiche une chaine de caractères
+ *
+ * @param str String
+ */
+void printString(const char* str) {
+    byte* charPtr = (byte*) str;
+    u16 index = cursorPosition;
+
+    while (*charPtr != '\0') {
+        switch (*charPtr) {
+            case '\n':
+                index += VGA_WIDTH;
+                [[fallthrough]]; // En cas de '\n' on veut aussi revenir à la ligne
+            case '\r':
+                index -= index % VGA_WIDTH;
+                break;
+
+            case '\t':
+                for (u8 i=0; i < (u8) (index % VGA_WIDTH) % TAB_LENGTH; i++) {
+                    *(VGA_MEMORY + index*2) = ' ';
+                    index++;
+                }
+                break;
+
+            default:
+                *(VGA_MEMORY + index*2) = *charPtr;
+                index++;
+                break;
+        }
+
+        charPtr++;
+    }
+
+    setCursorPosition(index);
 }
 
 #endif //ROMAINOS_PRINTTEXT_HPP
