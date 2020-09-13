@@ -5,6 +5,7 @@
 #define ROMAINOS_STRING_HPP
 
 #include "types.hpp"
+#include "stack.hpp"
 
 /**
  * Récupère la taille d'une string
@@ -46,6 +47,11 @@ public:
     }
 
     /**
+     * Destructeur
+     */
+    ~string() = default;
+
+    /**
      * Taille
      *
      * @return Taille
@@ -75,14 +81,41 @@ private:
     u32 _length;
 };
 
-/*
+char hexToChar(byte value) {
+    byte c = '\0';
 
-// TODO
+    if (value <= 9) {
+        c = '0' + value;
+    }
+    else if (value <= 15) {
+        c = 'a' + (value - 10);
+    }
+
+    return (char) c;
+}
 
 template<typename T>
-string hexToString(T value) {
+char* hexToString(T value, size_t minimalSize = 1) {
+    Stack<byte> stack;
 
+    while (value != 0) {
+        stack.push(value % 16);
+        value /= 16;
+    }
+
+    while (stack.length() < minimalSize) {
+        stack.push(0);
+    }
+
+    const size_t length = stack.length();
+
+    char str[length];
+
+    for (size_t i=0; i<length; i++) {
+        str[i] = stack.pop();
+    }
+
+    return str;
 }
-*/
 
 #endif //ROMAINOS_STRING_HPP
