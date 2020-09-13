@@ -89,4 +89,9 @@ typedef  int64_t i64;
  */
 typedef uint8_t byte;
 
+/**
+ * Size. 32 bits
+ */
+typedef uint32_t size_t;
+
 #endif //ROMAINOS_TYPES_HPP
