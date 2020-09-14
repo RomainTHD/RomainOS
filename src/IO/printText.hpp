@@ -5,9 +5,10 @@
 #define ROMAINOS_PRINTTEXT_HPP
 
 #include "types.hpp"
-#include "IO.hpp"
 #include "string.hpp"
-#include "textColorModes.h"
+
+#include "IO/IO.hpp"
+#include "IO/textColorModes.hpp"
 
 /**
  * Emplacement VRAM
@@ -77,6 +78,12 @@ void setCursorPosition(i16 row, i16 col) {
 void printString(const char* str, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
     byte* charPtr = (byte*) str;
     u16 index = cursorPosition;
+
+    if (*charPtr == '\0') {
+        setCursorPosition(-1, -1);
+        *(VGA_MEMORY + cursorPosition*2) = '*';
+        setCursorPosition(0);
+    }
 
     while (*charPtr != '\0') {
         switch (*charPtr) {
