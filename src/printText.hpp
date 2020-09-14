@@ -7,6 +7,7 @@
 #include "types.hpp"
 #include "IO.hpp"
 #include "string.hpp"
+#include "textColorModes.h"
 
 /**
  * Emplacement VRAM
@@ -71,8 +72,9 @@ void setCursorPosition(i16 row, i16 col) {
  * Affiche une chaine de caractères
  *
  * @param str String
+ * @param color Couleur
  */
-void printString(const char* str) {
+void printString(const char* str, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
     byte* charPtr = (byte*) str;
     u16 index = cursorPosition;
 
@@ -88,12 +90,14 @@ void printString(const char* str) {
             case '\t':
                 for (u8 i=0; i < (u8) (index % VGA_WIDTH) % TAB_LENGTH; i++) {
                     *(VGA_MEMORY + index*2) = ' ';
+                    *(VGA_MEMORY + index*2 + 1) = color;
                     index++;
                 }
                 break;
 
             default:
                 *(VGA_MEMORY + index*2) = *charPtr;
+                *(VGA_MEMORY + index*2 + 1) = color;
                 index++;
                 break;
         }
@@ -102,6 +106,37 @@ void printString(const char* str) {
     }
 
     setCursorPosition(index);
+}
+
+/**
+ * Clear l'écran VGA
+ *
+ * @param color Couleur
+ */
+void clearScreen(uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    // Fonctionne toujours
+    /*
+    uint64_t value = 0;
+    value += (uint64_t) color << 8;
+    value += (uint64_t) color << 24;
+    value += (uint64_t) color << 40;
+    value += (uint64_t) color << 56;
+
+    for (uint64_t *i = (u64 *)VGA_MEMORY; i < (u64 *)(VGA_MEMORY + 4000); i++) {
+        *i = value;
+    }
+     */
+
+    // Fonctionne ssi setCursorPosition loop à 0
+
+    setCursorPosition(0);
+
+    do {
+        *(VGA_MEMORY + cursorPosition*2) = ' ';
+        *(VGA_MEMORY + cursorPosition*2 + 1) = color;
+
+        setCursorPosition(cursorPosition+1);
+    } while (cursorPosition != 0);
 }
 
 #endif //ROMAINOS_PRINTTEXT_HPP
