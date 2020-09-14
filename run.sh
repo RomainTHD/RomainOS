@@ -11,10 +11,23 @@ nasm ./bootloader.asm -f bin -o ../../bin/bootloader.bin || exit
 echo "Compilation secteurs suivants..."
 cd ../secondSector || exit
 nasm ./extendedProgram.asm -f elf64 -o ../../bin/extendedProgram.o || exit
+nasm ./binaries.asm -f elf64 -o ../../bin/binaries.o || exit
 
 echo "Compilation C/C++..."
 cd .. || exit
-"$HOME"/opt/cross/bin/x86_64-elf-g++ -Ttext 0x8000 -ffreestanding -lstdc++ -mno-red-zone -m64 -c kernel.cpp -Wall -Wextra -pedantic -o ../bin/kernel.o || exit
+"$HOME"/opt/cross/bin/x86_64-elf-g++ \
+                          -Ttext 0x8000 \
+                          -ffreestanding \
+                          -lstdc++ \
+                          -mno-red-zone \
+                          -m64 \
+                          -Wall \
+                          -Wextra \
+                          -pedantic \
+                          -I . \
+                          -c kernel.cpp \
+                          -o ../bin/kernel.o \
+                      || exit
 
 echo "Linker..."
 cd ../bin || exit
@@ -24,7 +37,10 @@ echo "Fusion des fichiers binaires..."
 cd ..
 cat ./bin/bootloader.bin ./bin/kernel.bin > ./bin/RomainOS.bin || exit
 
+echo "Calcul du nombre de segments nécessaires..."
+echo "mov al," $(expr "$(wc -c < ./bin/RomainOS.bin)" / 512) > src/bootSector/diskReadSegments.asm
+
 echo "Exécution bootloader..."
 qemu-system-x86_64 -drive format=raw,file=./bin/RomainOS.bin || exit
 
-echo "Fin normale du programme"
+echo "Fin normale du programme."
