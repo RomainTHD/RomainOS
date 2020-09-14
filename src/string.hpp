@@ -81,41 +81,37 @@ private:
     u32 _length;
 };
 
-char hexToChar(byte value) {
-    byte c = '\0';
-
-    if (value <= 9) {
-        c = '0' + value;
-    }
-    else if (value <= 15) {
-        c = 'a' + (value - 10);
-    }
-
-    return (char) c;
-}
-
+/**
+ * Hex to String
+ *
+ * @tparam T Type
+ * @param value Valeur
+ *
+ * @return Hex
+ */
 template<typename T>
-char* hexToString(T value, size_t minimalSize = 1) {
-    Stack<byte> stack;
+const char* hexToString(T value) {
+    static char hexToStringOutput[128];
+    T* valPtr = &value;
+    u8* ptr;
+    u8 temp;
 
-    while (value != 0) {
-        stack.push(value % 16);
-        value /= 16;
+    /**
+     * Pour même taille entre 0b00000000 et 0b11111111 par exemple
+     */
+    u8 size = ((sizeof(T)) * 2 - 1);
+
+    for (u8 i = 0; i < size; i++) {
+        ptr = ((u8 *)valPtr + i);
+        temp = ((*ptr & 0xf0) >> 4);
+        hexToStringOutput[size - (i * 2 + 1)] = temp + (temp > 9 ? 55 : 48);
+        temp = ((*ptr & 0x0f));
+        hexToStringOutput[size - (i * 2 + 0)] = temp + (temp > 9 ? 55 : 48);
     }
 
-    while (stack.length() < minimalSize) {
-        stack.push(0);
-    }
+    hexToStringOutput[size + 1] = 0;
 
-    const size_t length = stack.length();
-
-    char str[length];
-
-    for (size_t i=0; i<length; i++) {
-        str[i] = stack.pop();
-    }
-
-    return str;
+    return hexToStringOutput;
 }
 
 #endif //ROMAINOS_STRING_HPP
