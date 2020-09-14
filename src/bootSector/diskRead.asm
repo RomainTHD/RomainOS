@@ -8,6 +8,7 @@ readDisk:
     ; Pour que le BIOS sache où mettre la data en mémoire
     mov bx, PROGRAM_SPACE
 
+    ; Nombre de secteurs de 512 bytes du disque
     %include "diskReadSegments.asm"
 
     ; Quel disque choisir

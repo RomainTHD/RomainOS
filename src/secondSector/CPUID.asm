@@ -14,6 +14,9 @@ detectCPUID:
     push eax
     popfd
 
+    pushfd
+    pop eax
+
     ; Restore flags à ancienne version
     push ecx
     popfd
