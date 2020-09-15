@@ -61,6 +61,8 @@ startProtectedMode:
 ; Fonction C
 [extern _start]
 
+%include "IDT.asm"
+
 start64Bits:
     ; VRAM
     mov edi, 0xb8000
