@@ -5,6 +5,7 @@ ENTRY(_start)
 INPUT (
     extendedProgram.o
     kernel.o
+    binaries.o
 )
 
 OUTPUT (
@@ -16,6 +17,13 @@ SECTIONS {
 
     .text : ALIGN(0x1000) {
         *(.text)
+    }
+
+    /* Pour les interruptions */
+    .idt BLOCK(0x1000) : ALIGN(0x1000) {
+        _idt = .;
+        /* On réserve au moins 4096 bytes */
+        . = . + 0x1000;
     }
 
     .data : ALIGN(0x1000) {
