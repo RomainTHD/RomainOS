@@ -44,9 +44,9 @@ void setCursorPosition(u16 pos) {
     pos %= (VGA_WIDTH * VGA_HEIGHT);
 
     outb(0x3d4, 0x0f);
-    outb(0x3d5, (byte)(pos & 0xff));
+    outb(0x3d5, (byte)(pos & (u16) 0xff));
     outb(0x3d4, 0x0e);
-    outb(0x3d5, (byte)((pos >> 8) & 0xff));
+    outb(0x3d5, (byte)((u16) (pos >> (u16) 8) & (u16) 0xff));
 
     _cursorPosition = pos;
 }
@@ -85,9 +85,25 @@ void setCursorPosition(i16 row, i16 col) {
  * @param color Couleur
  */
 void printChar(char c, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
-    *(VGA_MEMORY + getCursorPosition()*2) = c;
-    *(VGA_MEMORY + getCursorPosition()*2 + 1) = color;
-    setCursorPosition(getCursorPosition()+1);
+    switch (c) {
+        case '\n':
+            setCursorPosition(getCursorPosition() + VGA_WIDTH);
+            [[fallthrough]]; // En cas de '\n' on veut aussi revenir à la ligne
+        case '\r':
+            setCursorPosition(getCursorPosition() - (getCursorPosition() %  VGA_WIDTH));
+            break;
+
+        case '\t':
+            for (u8 i=0; i < (u8) (getCursorPosition() % VGA_WIDTH) % TAB_LENGTH; i++) {
+                printChar(' ');
+            }
+            break;
+
+        default:
+            *(VGA_MEMORY + getCursorPosition()*2) = c;
+            *(VGA_MEMORY + getCursorPosition()*2 + 1) = color;
+            setCursorPosition(getCursorPosition()+1);
+    }
 }
 
 /**
@@ -105,25 +121,7 @@ void printString(const char* str, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
     }
 
     while (*charPtr != '\0') {
-        switch (*charPtr) {
-            case '\n':
-                setCursorPosition(getCursorPosition() + VGA_WIDTH);
-                [[fallthrough]]; // En cas de '\n' on veut aussi revenir à la ligne
-            case '\r':
-                setCursorPosition(getCursorPosition() - (getCursorPosition() %  VGA_WIDTH));
-                break;
-
-            case '\t':
-                for (u8 i=0; i < (u8) (getCursorPosition() % VGA_WIDTH) % TAB_LENGTH; i++) {
-                    printChar(*charPtr);
-                }
-                break;
-
-            default:
-                printChar(*charPtr);
-                break;
-        }
-
+        printChar(*charPtr);
         charPtr++;
     }
 }
