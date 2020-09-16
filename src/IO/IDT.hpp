@@ -83,6 +83,8 @@ void initIDT() {
         _idt[t].types_attr = 0x8e;
     }
 
+    // remapPIC();
+
     // Reprogramme la puce PIC (Programmable Interface Controllers)
     outb(0x21, 0xfd);
     outb(0xa1, 0xff);
@@ -95,8 +97,22 @@ void initIDT() {
  */
 extern "C" void isr1Handler() {
     // Lit depuis le port clavier
-    printChar(Keyboard::toChar(inb(0x60)));
-    // printString(hexToString(inb(0x60)));
+    char c;
+    bool pressed;
+    KeyEvent event = Keyboard::getEvent(inb(0x60));
+
+    if (event.pressed) {
+        if (event.key == (char) KEY_NOT_SUPPORTED) {
+            printString(hexToString(inb(0x60)));
+        }
+        else {
+            printChar(event.key);
+
+            if (event.shift) {
+                printChar('7');
+            }
+        }
+    }
 
     // Signifie au PIC que l'interruption est terminée
     outb(0x20, 0x20);
