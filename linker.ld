@@ -13,10 +13,12 @@ OUTPUT (
 )
 
 SECTIONS {
+    /* Début des sections */
     . = 0x8000;
 
     .text : ALIGN(0x1000) {
         *(.text)
+        *(.rodata)
     }
 
     /* Pour les interruptions */
@@ -26,16 +28,15 @@ SECTIONS {
         . = . + 0x1000;
     }
 
+    /* Read-only data */
+    .rodata : ALIGN(0x1000) {}
+
+    /* Read-write initialized data */
     .data : ALIGN(0x1000) {
         *(.data)
     }
 
-    /* Read-only data */
-    .rodata : ALIGN(0x1000) {
-        *(.rodata)
-    }
-
-    /* Uninitialized data */
+    /* Read-write uninitialized data + stack */
     .bss : ALIGN(0x1000) {
         *(COMMON)
         *(.bss)
