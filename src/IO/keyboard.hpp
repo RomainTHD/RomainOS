@@ -4,10 +4,12 @@
 #ifndef ROMAINOS_KEYBOARD_HPP
 #define ROMAINOS_KEYBOARD_HPP
 
+#include "keyboardLayouts/AZERTY.hpp"
+
 /**
  * Touche non supportée
  */
-#define KEY_NOT_SUPPORTED 0xfe
+// #define KEY_NOT_SUPPORTED 0xfe
 
 /**
  * Différents layouts
@@ -16,58 +18,74 @@ enum KeyboardLayout {
     AZERTY
 };
 
+/**
+ * Event clavier
+ */
 struct KeyEvent {
+    /**
+     * Caractère ('a', '1'...), '\0' si caractère spécial
+     */
     char key;
+
+    /**
+     * Code clavier (0x1e pour 'q')
+     */
+    byte keyCode;
+
+    /**
+     * Code clavier raw (0x1e pour 'q' pressé, ox9e pour 'q' relâché)
+     */
+    byte keyCodeRaw;
+
+    /**
+     * Touche enfoncée ou non
+     */
     bool pressed;
+
+    /**
+     * Est en ctrl ou non
+     */
     bool ctrl;
+
+    /**
+     * Est en alt ou non
+     */
     bool alt;
+
+    /**
+     * Est en shift ou non
+     */
     bool shift;
 };
 
 /**
- * Layout actuel
+ * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
  */
-KeyboardLayout _keyboardLayout;
+namespace {
+    /**
+     * Layout actuel
+     */
+    KeyboardLayout _keyboardLayout = AZERTY;
 
-bool _isCtrl;
-bool _isAlt;
-bool _isShift;
+    /**
+     * Est en ctrl ou non
+     */
+    bool _isCtrl = false;
 
-void handleAzerty(byte b, char* out, bool* pressed) {
-    // TODO:  Utiliser un tableau pour map ?
+    /**
+     * Est en alt ou non
+     */
+    bool _isAlt = false;
 
-    *pressed = !(b & (byte) 0x80);
+    /**
+     * Est en shift ou non
+     */
+    bool _isShift = false;
 
-    if (b >= 0x10 && b <= 0x19) {
-        char str[] = "azertyuiop";
-        *out = str[b - 0x10];
-    }
-    else if (b >= 0x1e && b <= 0x27) {
-        char str[] = "qsdfghjklm";
-        *out = str[b - 0x1e];
-    }
-    else if (b >= 0x2c && b <= 0x31) {
-        char str[] = "wxcvbn";
-        *out = str[b - 0x2c];
-    }
-    else {
-        switch (b) {
-            case 0x39:
-                *out = ' ';
-                break;
-
-            case 0x1c:
-                *out = '\n';
-                break;
-
-            case 0x0f:
-                *out = '\t';
-                break;
-
-            default:
-                *out = (char) KEY_NOT_SUPPORTED;
-        }
-    }
+    /**
+     * Est en caps lock ou non
+     */
+    bool _isCapsLock = false;
 }
 
 /**
@@ -95,6 +113,7 @@ public:
         _isCtrl = false;
         _isAlt = false;
         _isShift = false;
+        _isCapsLock = false;
     }
 
     /**
@@ -104,29 +123,55 @@ public:
      *
      * @return Char associé
      */
-    static KeyEvent getEvent(byte b) {
+    static KeyEvent getEvent(byte keyCode) {
         KeyEvent event {};
 
+        event.key = '\0';
+        event.keyCode = (byte) (keyCode << (byte) 1) >> (byte) 1;
+        event.keyCodeRaw = keyCode;
+        event.pressed = !(keyCode & (byte) 0x80);
         event.ctrl = _isCtrl;
         event.alt = _isAlt;
         event.shift = _isShift;
 
-        // if (b == 0x)
-
         switch (_keyboardLayout) {
             case AZERTY:
             default:
-                handleAzerty(b, &(event.key), &(event.pressed));
+                event.key = _layoutAZERTY[keyCode];
                 break;
+        }
+
+        switch (event.keyCode) {
+            case VK_SHIFT:
+                _isShift = !_isShift;
+                break;
+
+            case VK_ALT:
+                _isAlt = !_isAlt;
+                break;
+
+            case VK_CAPS_LOCK:
+                if (event.pressed) {
+                    _isCapsLock = !_isCapsLock;
+                }
+                break;
+
+            case VK_CTRL:
+                _isCtrl = !_isCtrl;
+                break;
+
+            default:
+                break;
+        }
+
+        if (event.shift xor _isCapsLock) {
+            if (event.key >= 'a' && event.key <= 'z') {
+                event.key += ('A' - 'a');
+            }
         }
 
         return event;
     }
 };
-
-/*
-void Keyboard::setKeyboardLayout(KeyboardLayout layout) {
-    _keyboardLayout = layout;
-}*/
 
 #endif //ROMAINOS_KEYBOARD_HPP
