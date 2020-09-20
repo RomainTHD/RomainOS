@@ -41,12 +41,15 @@ merge:
 	cat ./bin/bootloader.bin ./bin/kernel.bin > ./bin/RomainOS.bin
 
 calcNbSeg:
-	nbSeg=$(expr "$(wc -c < ./bin/RomainOS.bin)" / 512)
-	echo "Nombre de segments nécessaires:" $nbSeg
-	echo "; Fichier généré automatiquement par le script 'run.sh' selon l'espace occupé par le fichier binaire final" > src/bootSector/diskReadSegments.asm
-	# echo "mov al," $nbSeg >> src/bootSector/diskReadSegments.asm
-	echo "mov al, 26" >> src/bootSector/diskReadSegments.asm
+	echo "; Fichier généré automatiquement." > src/bootSector/diskReadSegments.asm
+	echo "; La valeur est calculée selon l'espace occupé par le fichier binaire final." >> src/bootSector/diskReadSegments.asm
+	nbSeg=$$(($$(wc -c < ./bin/RomainOS.bin)/512)) && \
+	echo -n "Nombre de segments nécessaires: $$nbSeg" && \
+	echo "mov al," $$nbSeg >> src/bootSector/diskReadSegments.asm
 
 run:
 	echo "Exécution bootloader..."
-	qemu-system-x86_64 -m 16 -drive format=raw,file=./bin/RomainOS.bin || exit
+	qemu-system-x86_64 \
+				-m 16 \
+				-drive format=raw,file=./bin/RomainOS.bin \
+				--no-reboot
