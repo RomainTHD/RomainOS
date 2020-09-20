@@ -77,10 +77,30 @@ start64Bits:
 
     rep stosq
 
+    call activateSSE
+
     ; Fonction C
     call _start
 
     ; Boucle infinie, fin
     jmp $
+
+; Active les Streaming SIMD Extensions (SSE)
+; Opérations sur floating point (maths + comparaisons), cast de double / float ou vers double / float
+activateSSE:
+    ; Set le dernier bit et unset l'avant dernier de cr0
+    ; Bit 6 (unsed) : coprocessor emulation
+    ; Bit 7 (set) : coprocessor monitoring
+    mov rax, cr0
+    and ax, 0b11111101
+    or ax, 0b00000001
+    mov cr0, rax
+
+    ; Set les bits 0 et 1 de cr4
+    mov rax, cr4
+    or ax, 0b1100000000
+    mov cr4, rax
+
+    ret
 
 times 2048-($-$$) db 0
