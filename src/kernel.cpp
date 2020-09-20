@@ -3,14 +3,16 @@
 
 #include "IO/printText.hpp"
 #include "IO/IDT.hpp"
+#include "random.hpp"
 
 /**
  * Point d'entrée de l'OS
  */
 extern "C" void _start() {
-    clearScreen();
-    setCursorPosition(0, 0);
-    initIDT();
+    std::IO::clearScreen();
+    std::IO::setCursorPosition(0, 0);
+    std::IO::IDT::initIDT();
     Keyboard::setKeyboardLayout(AZERTY);
-    printString("Tout fonctionne !", BG_RED | FG_WHITE);
+    std::IO::printString("Tout fonctionne !\n", BG_RED | FG_WHITE);
+    std::IO::printInt(std::random::randint(100));
 }
