@@ -114,4 +114,98 @@ const char* hexToString(T value) {
     return hexToStringOutput;
 }
 
+/**
+ * Int vers string
+ *
+ * @tparam T Type
+ * @param value Int
+ *
+ * @return String de l'int
+ */
+template<typename T>
+const char* intToString(T value) {
+    bool isNegative = false;
+
+    if (value < 0) {
+        isNegative = true;
+        value *= -1;
+    }
+
+    static char integerToStringOutput[128];
+    u8 size = 0;
+    u64 sizeTester = (u64) value;
+    u8 index = 0;
+
+    while (sizeTester / 10 > 0) {
+        sizeTester /= 10;
+        size++;
+    }
+
+    if (isNegative) {
+        size++;
+    }
+
+    u64 newValue = (u64) value;
+    while (newValue / 10 > 0) {
+        u8 remainder = newValue % 10;
+        newValue /= 10;
+        integerToStringOutput[size - index] = (char) (remainder + '0');
+        index++;
+    }
+
+    u8 remainder = newValue % 10;
+    integerToStringOutput[size - index] = (char) (remainder + '0');
+    index++;
+
+    if (isNegative == 1) {
+        integerToStringOutput[size - index] = '-';
+    }
+    integerToStringOutput[size + 1] = '\0';
+
+    return integerToStringOutput;
+}
+
+/**
+ * Float to string
+ *
+ * @tparam T Type
+ * @param value Value
+ * @param decimalPlaces Nb de décimales
+ *
+ * @return String de float
+ */
+template <typename T>
+const char* floatToString(T value, u8 decimalPlaces = 3) {
+    static char floatToStringOutput[128];
+    char *intPtr = (char*) intToString((int) value);
+    char *floatPtr = floatToStringOutput;
+
+    if (value < 0) {
+        value *= -1;
+    }
+
+    while (*intPtr != '\0') {
+        *floatPtr = *intPtr;
+
+        floatPtr++;
+        intPtr++;
+    }
+
+    *floatPtr = '.';
+    floatPtr++;
+
+    T newValue = value - (int) value;
+
+    for (u8 i = 0; i < decimalPlaces; i++) {
+        newValue *= 10;
+        *floatPtr = (char) newValue + '0';
+        floatPtr++;
+        newValue = newValue - (int) newValue;
+    }
+
+    *floatPtr = '\0';
+
+    return floatToStringOutput;
+}
+
 #endif //ROMAINOS_STRING_HPP
