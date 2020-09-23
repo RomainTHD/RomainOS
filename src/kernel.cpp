@@ -4,6 +4,7 @@
 #include "IO/printText.hpp"
 #include "IO/IDT.hpp"
 #include "random.hpp"
+#include "memoryMap.hpp"
 
 /**
  * Point d'entrée de l'OS
@@ -13,6 +14,23 @@ extern "C" void _start() {
     std::IO::setCursorPosition(0, 0);
     std::IO::IDT::initIDT();
     Keyboard::setKeyboardLayout(AZERTY);
+
+    /*
+    for (u8 i=0; i<std::memory::getMemoryRegionCount(); i++) {
+        std::memory::MemoryMapEntry* entry = (std::memory::MemoryMapEntry*) 0x5000;
+        entry += i;
+        std::memory::printMemoryMap(entry);
+        std::IO::printString();
+    }
+    /*/
+    std::memory::MemoryMapEntry** usableMemoryMap = std::memory::getUsableMemoryRegions();
+
+    for (u8 i=0; i<std::memory::getNumberOfUsableMemoryRegions(); i++) {
+        std::memory::MemoryMapEntry* entry = usableMemoryMap[i];
+        std::memory::printMemoryMap(entry);
+        std::IO::printString();
+    }
+    //*/
+
     std::IO::printString("Tout fonctionne !\n", BG_RED | FG_WHITE);
-    std::IO::printInt(std::random::randint(100));
 }
