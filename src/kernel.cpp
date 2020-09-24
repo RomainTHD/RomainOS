@@ -3,7 +3,6 @@
 
 #include "IO/printText.hpp"
 #include "IO/IDT.hpp"
-#include "random.hpp"
 #include "memoryMap.hpp"
 
 /**
@@ -13,7 +12,7 @@ extern "C" void _start() {
     std::IO::clearScreen();
     std::IO::setCursorPosition(0, 0);
     std::IO::IDT::initIDT();
-    Keyboard::setKeyboardLayout(AZERTY);
+    std::IO::setKeyboardLayout(std::IO::AZERTY);
 
     /*
     for (u8 i=0; i<std::memory::getMemoryRegionCount(); i++) {

@@ -6,109 +6,92 @@
 
 #include "keyboardLayouts/AZERTY.hpp"
 
-/**
- * Touche non supportée
- */
-// #define KEY_NOT_SUPPORTED 0xfe
-
-/**
- * Différents layouts
- */
-enum KeyboardLayout {
-    AZERTY
-};
-
-/**
- * Event clavier
- */
-struct KeyEvent {
+namespace std::IO {
     /**
-     * Caractère ('a', '1'...), '\0' si caractère spécial
+     * Différents layouts
      */
-    char key;
+    enum KeyboardLayout {
+        AZERTY
+    };
 
     /**
-     * Code clavier (0x1e pour 'q')
+     * Event clavier
      */
-    byte keyCode;
+    struct KeyEvent {
+        /**
+         * Caractère ('a', '1'...), '\0' si caractère spécial
+         */
+        char key;
 
-    /**
-     * Code clavier raw (0x1e pour 'q' pressé, ox9e pour 'q' relâché)
-     */
-    byte keyCodeRaw;
+        /**
+         * Code clavier (0x1e pour 'q')
+         */
+        byte keyCode;
 
-    /**
-     * Touche enfoncée ou non
-     */
-    bool pressed;
+        /**
+         * Code clavier raw (0x1e pour 'q' pressé, ox9e pour 'q' relâché)
+         */
+        byte keyCodeRaw;
 
-    /**
-     * Est en ctrl ou non
-     */
-    bool ctrl;
+        /**
+         * Touche enfoncée ou non
+         */
+        bool pressed;
 
-    /**
-     * Est en alt ou non
-     */
-    bool alt;
+        /**
+         * Est en ctrl ou non
+         */
+        bool ctrl;
 
-    /**
-     * Est en shift ou non
-     */
-    bool shift;
-};
+        /**
+         * Est en alt ou non
+         */
+        bool alt;
 
-/**
- * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
- */
-namespace {
-    /**
-     * Layout actuel
-     */
-    KeyboardLayout _keyboardLayout = AZERTY;
+        /**
+         * Est en shift ou non
+         */
+        bool shift;
+    };
 
-    /**
-     * Est en ctrl ou non
-     */
-    bool _isCtrl = false;
+    namespace {
+        /**
+         * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
+         */
+        namespace {
+            /**
+             * Layout actuel
+             */
+            KeyboardLayout _keyboardLayout = AZERTY;
 
-    /**
-     * Est en alt ou non
-     */
-    bool _isAlt = false;
+            /**
+             * Est en ctrl ou non
+             */
+            bool _isCtrl = false;
 
-    /**
-     * Est en shift ou non
-     */
-    bool _isShift = false;
+            /**
+             * Est en alt ou non
+             */
+            bool _isAlt = false;
 
-    /**
-     * Est en caps lock ou non
-     */
-    bool _isCapsLock = false;
-}
+            /**
+             * Est en shift ou non
+             */
+            bool _isShift = false;
 
-/**
- * Classe clavier
- */
-class Keyboard {
-public:
-    /**
-     * Suppression du constructeur
-     */
-    Keyboard() = delete;
-
-    /**
-     * Destructeur
-     */
-    ~Keyboard() = default;
+            /**
+             * Est en caps lock ou non
+             */
+            bool _isCapsLock = false;
+        }
+    }
 
     /**
      * Set la disposition clavier
      *
      * @param layout Layout
      */
-    static void setKeyboardLayout(KeyboardLayout layout) {
+    void setKeyboardLayout(KeyboardLayout layout) {
         _keyboardLayout = layout;
         _isCtrl = false;
         _isAlt = false;
@@ -123,7 +106,7 @@ public:
      *
      * @return Char associé
      */
-    static KeyEvent getEvent(byte keyCode) {
+    KeyEvent getEvent(byte keyCode) {
         KeyEvent event {};
 
         event.key = '\0';
@@ -172,6 +155,32 @@ public:
 
         return event;
     }
-};
+
+    /**
+     * Gère un évènement
+     *
+     * @param b Code
+     */
+    void handleEvent(byte b) {
+        KeyEvent event = getEvent(b);
+        std::IO::printChar(event.key);
+
+        if (event.keyCode == VK_ESC) {
+            std::IO::setCursorPosition(-1, 0);
+            std::IO::printString("Fin du programme...");
+
+            for (int i=0; i<10000000; i++) {}
+
+            std::IO::outw(0x604, 0x2000); // Qemu
+            // outw(0x4004, 0x3400); // VBox
+            // outw(0xB004, 0x2000); // Boshs
+
+            std::IO::setCursorPosition(-1, 0);
+            std::IO::printString("Erreur lors de la sortie de l'emulateur !");
+            for (int i=0; i<10000000; i++) {}
+
+        }
+    }
+}
 
 #endif //ROMAINOS_KEYBOARD_HPP

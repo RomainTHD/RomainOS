@@ -106,8 +106,7 @@ namespace std::IO::IDT {
         outb(0x20, 0x20);
         outb(0xa0, 0x20);
 
-        KeyEvent event = Keyboard::getEvent(b);
-        printChar(event.key);
+        std::IO::handleEvent(b);
     }
 }
 
