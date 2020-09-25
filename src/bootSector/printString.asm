@@ -1,5 +1,5 @@
 ; Affiche une chaine de caractères terminée par '\0'
-printString:
+printStringBIOS:
     push ax
     push bx
 

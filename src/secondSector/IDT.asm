@@ -31,9 +31,9 @@ IDTDescriptor:
 [extern isr1Handler]
 
 ; Rend isr1 global et donc utilisable par le kernel C++
-GLOBAL isr1
+GLOBAL _isr1
 ; Interrupt service routine 1, = keyboard
-isr1:
+_isr1:
     ; Pour maintenir l'état des registres
     PUSHALL
     call isr1Handler
@@ -41,9 +41,9 @@ isr1:
     ; Interrupt return quad (car 64 bits)
     iretq
 
-GLOBAL loadIDT
+GLOBAL _loadIDT
 ; Charge les interruptions IDT
-loadIDT:
+_loadIDT:
     lidt [IDTDescriptor]
     ; Active les interruptions IDT
     sti

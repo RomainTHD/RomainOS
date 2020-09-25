@@ -36,7 +36,7 @@ diskReadErrorString:
 
 diskReadError:
     mov bx, diskReadErrorString
-    call printString
+    call printStringBIOS
     ; Boucle infinie parce que erreur de toute façon
     jmp $
 
