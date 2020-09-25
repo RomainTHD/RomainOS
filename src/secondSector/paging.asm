@@ -38,11 +38,11 @@ setIdentityPaging:
     ; Set long mode bit
     mov ecx, 0xc0000080
     rdmsr
-    or eax, 1 << 8
+    bts eax, 8
     wrmsr
 
     mov eax, cr0
-    or eax, 1 << 31
+    bts eax, 31
     mov cr0, eax
 
     ret

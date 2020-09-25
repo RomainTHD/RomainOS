@@ -16,19 +16,19 @@ enterProtectedMode:
     ; Load GDT
     lgdt [gdt_descriptor]
 
-    ; Set un bit pour indiquer protected mode
+    ; Set un bit 0 pour indiquer protected mode
     mov eax, cr0
-    or eax, 1
+    bts eax, 0
     mov cr0, eax
 
     jmp codeSegment:startProtectedMode
 
-; Grosse horreur, legacy stuff, activer les lignes d'adresse A20 à A32 pour la RAM
+; Legacy stuff pour activer les lignes d'adresse A20 à A32 pour la RAM
 ; Cf. http://www.independent-software.com/operating-system-development-enabling-a20-line.html
 enableA20:
     ; On prend un truc en entrée
     in al, 0x92
-    ; Binary OR
+    ; Set le bit 1
     or al, 2
     ; On set ce truc en sortie
     out 0x92, al
@@ -95,7 +95,7 @@ activateSSE:
     ; Bit 7 (set) : coprocessor monitoring
     mov rax, cr0
     and ax, 0b11111101
-    or ax, 0b00000001
+    bts ax, 0
     mov cr0, rax
 
     ; Set les bits 0 et 1 de cr4
