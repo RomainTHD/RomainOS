@@ -24,4 +24,4 @@ Enfin, la méthode <code>_start</code> de <code>src/kernel.cpp</code> est appel�
 Maintenant, en C++ maintenant, le curseur est instancié, les interruptions clavier (IDT) initialisées, le layout du clavier set,
 et les régions utilisables en mémoire récupérées. 
 
-Et après tout ça, le noyau est ready <img src="https://image.jeuxvideo.com/stickers/p/1lmh" />
+Et après tout ça, le noyau est ready !<br><img src="https://image.noelshack.com/fichiers/2018/18/5/1525431412-macron2.png" />
