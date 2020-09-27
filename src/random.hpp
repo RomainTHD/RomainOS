@@ -4,38 +4,41 @@
 #ifndef ROMAINOS_RANDOM_HPP
 #define ROMAINOS_RANDOM_HPP
 
-#include "types.hpp"
+#include <types.hpp>
 
 /**
  * Rand max exclus
  */
-#define _RAND_MAX 32768
+#define _RAND_MAX ((u64) -1)
+
+/**
+ * Random seed
+ *
+ * @param seed Seed
+ */
+extern "C" void _srands(u64 seed);
+
+/**
+ * Random seed
+ */
+extern "C" void _srand();
+
+/**
+ * Random int
+ */
+extern "C" u64 _randint();
+
+/**
+ * Get seed
+ */
+extern "C" u64 _getSeed();
 
 namespace std::random {
-    namespace {
-        /**
-         * Next sous-seed pour le random
-         */
-        u32 _next = 1;
-
-        /**
-         * Fonction random comme définie dans la bibliothèque C
-         *
-         * @return Nb random entre 0 inclus et 32768 exclus
-         */
-        u32 _randint() {
-            _next = _next * 1103515245 + 12345;
-            return (u32) (_next / (_RAND_MAX * 2)) % _RAND_MAX;
-        }
-    }
-
     /**
-     * Double aléatoire dans [0;1[
-     *
-     * @return Double
+     * @return Random int
      */
-    double rand() {
-        return (double) _randint() / (double) _RAND_MAX;
+    u64 randint() {
+        return _randint();
     }
 
     /**
@@ -45,8 +48,17 @@ namespace std::random {
      *
      * @return Random
      */
-    u32 randint(u32 max) {
-        return rand() * max;
+    u64 randint(u64 max) {
+        return randint() % max;
+    }
+
+    /**
+     * Double aléatoire dans [0;1[
+     *
+     * @return Double
+     */
+    double rand() {
+        return (double) randint() / (double) _RAND_MAX;
     }
 
     /**
@@ -58,16 +70,27 @@ namespace std::random {
      * @return Random
      */
     i32 randint(i32 min, i32 max) {
-        return min + rand() * (max - min);
+        return min + rand() * (double) (max - min);
     }
 
     /**
-     * Seed random
+     * Set seed
      *
      * @param seed Seed
      */
-    void srand(u32 seed) {
-        _next = seed;
+    void srand(u64 seed) {
+        _srands(seed);
+    }
+
+    /**
+     * Set random seed
+     */
+    void srand() {
+        _srand();
+    }
+
+    u64 getSeed() {
+        return _getSeed();
     }
 }
 

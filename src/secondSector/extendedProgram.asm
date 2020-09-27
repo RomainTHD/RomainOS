@@ -1,5 +1,6 @@
 jmp enterProtectedMode
 
+%include "time.asm"
 %include "GDT.asm"
 %include "printString.asm"
 %include "memory.asm"
@@ -49,8 +50,8 @@ startProtectedMode:
     mov gs, ax
 
     ; Décale le stack là où y aura bien plus de place et où ça gênera pas
-    ; mov ebp, 0x90000
-    ; mov esp, ebp
+    mov ebp, 0x90000
+    mov esp, ebp
 
     call detectCPUID
     call detectLongMode
@@ -64,6 +65,7 @@ startProtectedMode:
 [extern _start]
 
 %include "IDT.asm"
+%include "system.asm"
 
 start64Bits:
     ; VRAM
@@ -80,6 +82,10 @@ start64Bits:
     rep stosq
 
     call activateSSE
+
+    mov rcx, 1234567890
+    mov [seed], rcx
+    call _srand
 
     ; Fonction C
     call _start
