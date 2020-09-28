@@ -128,18 +128,28 @@ namespace std::IO {
      * @param str String
      * @param color Couleur
      */
-    void printString(const char *str, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
-        byte *charPtr = (byte *) str;
-
-        if (*charPtr == '\0') {
-            printString(hexToString(str));
+    void printString(const char *str = "", char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+        if (str == nullptr) {
+            u16 c = getCursorPosition();
             setCursorPosition(-1, -1);
             printChar('*', color);
+            setCursorPosition(c);
         }
+        else {
+            byte* charPtr = (byte*) str;
 
-        while (*charPtr != '\0') {
-            printChar(*charPtr, color);
-            charPtr++;
+            while (*charPtr != '\0') {
+                printChar(*charPtr, color);
+                charPtr++;
+            }
+
+            if (end != nullptr) {
+                charPtr = (byte *) end;
+                while (*charPtr != '\0') {
+                    printChar(*charPtr, color);
+                    charPtr++;
+                }
+            }
         }
     }
 
@@ -169,6 +179,45 @@ namespace std::IO {
         do {
             printChar(' ', color);
         } while (getCursorPosition() != 0);
+    }
+
+    /**
+     * Print int
+     *
+     * @tparam T Type int
+     * @param value Valeur à print
+     * @param end Fin de chaine
+     * @param color Couleur
+     */
+    template <typename T>
+    void printInt(T value, char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+        printString(intToString(value), end, color);
+    }
+
+    /**
+     * Print float
+     *
+     * @tparam T Type float
+     * @param value Valeur à print
+     * @param end Fin de chaine
+     * @param color Couleur
+     */
+    template <typename T>
+    void printFloat(T value, char* end = "\n", u8 decimalPlaces = 3, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+        printString(floatToString(value, decimalPlaces), end, color);
+    }
+
+    /**
+     * Print int hex
+     *
+     * @tparam T Type int
+     * @param value Valeur à print
+     * @param end Fin de chaine
+     * @param color Couleur
+     */
+    template <typename T>
+    void printHex(T value, char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+        printString(hexToString(value), end, color);
     }
 }
 

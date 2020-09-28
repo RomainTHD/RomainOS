@@ -76,16 +76,16 @@ namespace std::memory {
     }
 
     void printMemoryMap(MemoryMapEntry* entry) {
-        std::IO::printString("Memory base: \t\t");
+        std::IO::printString("Memory base: \t\t", "");
         std::IO::printInt(entry->baseAddress);
 
-        std::IO::printString("Memory length: \t\t");
+        std::IO::printString("Memory length: \t\t", "");
         std::IO::printInt(entry->regionLength);
 
-        std::IO::printString("Memory type: \t\t");
+        std::IO::printString("Memory type: \t\t", "");
         std::IO::printHex(entry->regionType);
 
-        std::IO::printString("Memory attributes: \t");
+        std::IO::printString("Memory attributes: \t", "");
         std::IO::printHex(entry->extendedAttributes);
     }
 }
