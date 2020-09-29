@@ -94,4 +94,36 @@ typedef uint8_t byte;
  */
 typedef uint32_t size_t;
 
+namespace std::types {
+    namespace {
+        /**
+         * @see isPointer
+         */
+        template<typename T>
+        struct _isPointer {
+            static const bool value = false;
+        };
+
+        /**
+         * @see isPointer
+         */
+        template<typename T>
+        struct _isPointer<T*> {
+            static const bool value = true;
+        };
+    }
+
+    /**
+     * Si la variable est un pointeur ou non
+     *
+     * @tparam T Type
+     *
+     * @return Pointeur ou non
+     */
+    template<typename T>
+    bool isPointer(T) {
+        return _isPointer<T>::value;
+    }
+}
+
 #endif //ROMAINOS_TYPES_HPP

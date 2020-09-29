@@ -166,6 +166,20 @@ const char* intToString(T value) {
 }
 
 /**
+ * Hack pour utiliser intToString sur des pointeurs.
+ * Le <code>value *= -1;</code> ne passe en effet pas pour des pointeurs.
+ *
+ * @tparam T Type
+ * @param value Int*
+ *
+ * @return String de l'int
+ */
+template<typename T>
+const char* intToString(T* value) {
+    return intToString((u64) value);
+}
+
+/**
  * Float to string
  *
  * @tparam T Type
