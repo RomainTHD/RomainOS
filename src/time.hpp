@@ -27,7 +27,7 @@ namespace std::time {
         /**
          * Destructeur
          */
-        virtual ~TimeScale() = default;
+        ~TimeScale() = default;
 
         /**
          * Constructeur depuis secondes
@@ -151,7 +151,7 @@ namespace std::time {
          * @return TimeScale modifiée
          */
         TimeScale& addMicro(u64 micro) {
-            setMicro(micro);
+            setMicro(toMicro() + micro);
             return *this;
         }
     private:
@@ -160,16 +160,14 @@ namespace std::time {
          */
         u64 _micro;
     };
-}
 
-namespace std::time {
     /**
      * Sleep
      *
      * @param scale Temps
      */
     void sleep(const TimeScale& scale) {
-        for (u64 i=0; i<scale.toMicro(); i++) {
+        for (u64 i=0; i<scale.toMicro()*4; i++) {
             asm ("nop");
         }
     }
@@ -180,13 +178,8 @@ namespace std::time {
      * @param s Secondes
      * @param micro Microsecondes
      */
-    [[deprecated("Replaced by sleep(const TimeScale&)")]]
     void sleep(u32 s, u32 micro = 0) {
-        u64 micro64 = micro + ((u64) s)*10e6;
-
-        for (u64 i=0; i<micro64; i++) {
-            asm ("nop");
-        }
+        sleep(TimeScale::fromSec(s).addMicro(micro));
     }
 }
 
