@@ -4,23 +4,175 @@
 #ifndef ROMAINOS_MEMORY_HPP
 #define ROMAINOS_MEMORY_HPP
 
-#include "types.hpp"
+#include <types.hpp>
 
 namespace std::memory {
+    namespace {
+        /**
+         * Segment RAM (liste chaînée)
+         */
+        struct MemorySegment {
+            /**
+             * Taille
+             */
+            u64 length;
+
+            /**
+             * Segment suivant
+             */
+            MemorySegment* nextSegment;
+
+            /**
+             * Segment précédent
+             */
+            MemorySegment* prevSegment;
+
+            /**
+             * Segment libre suivant
+             */
+            MemorySegment* nextFreeSegment;
+
+            /**
+             * Segment libre précédent
+             */
+            MemorySegment* prevFreeSegment;
+
+            /**
+             * Segment libre ou non
+             */
+            bool isFree;
+        };
+
+        /**
+         * Combine deux segments libres et évite la fragmentation
+         *
+         * @param segA Segment A
+         * @param segB Segment B
+         */
+        void combineFreeSegments(MemorySegment* segA, MemorySegment* segB) {
+            if (segA == nullptr) {
+                return;
+            }
+
+            if (segB == nullptr) {
+                return;
+            }
+
+            if (segA < segB) {
+                segA->length += segB->length + sizeof(MemorySegment);
+                segA->nextSegment = segB->nextSegment;
+                segA->nextFreeSegment = segB->nextFreeSegment;
+
+                segB->nextSegment->prevSegment = segA;
+                segB->nextSegment->prevFreeSegment = segA;
+                segB->nextFreeSegment->prevFreeSegment = segA;
+            }
+            else {
+                segB->length += segA->length + sizeof(MemorySegment);
+                segB->nextSegment = segA->nextSegment;
+                segB->nextFreeSegment = segA->nextFreeSegment;
+
+                segA->nextSegment->prevSegment = segB;
+                segA->nextSegment->prevFreeSegment = segB;
+                segA->nextFreeSegment->prevFreeSegment = segB;
+            }
+        }
+
+        /**
+         * 1er segment
+         */
+        MemorySegment* _firstFreeSegment;
+    }
+
     /**
-     * Alloue de la mémoire
+     * Initialise la RAM en allouant un segment XXL qui sera ensuite découpé plus tard
+     *
+     * @param heapAddress Adresse du segment
+     * @param heapLength Taille du segment
+     */
+    void initHeap(u64 heapAddress, u64 heapLength) {
+        _firstFreeSegment = (MemorySegment*) heapAddress;
+        _firstFreeSegment->length = heapLength - sizeof(MemorySegment);
+        _firstFreeSegment->nextSegment = nullptr;
+        _firstFreeSegment->prevSegment = nullptr;
+        _firstFreeSegment->nextFreeSegment = nullptr;
+        _firstFreeSegment->prevFreeSegment = nullptr;
+        _firstFreeSegment->isFree = true;
+    }
+
+    /**
+     * Alloue de la mémoire.
+     * On est honnêtement pas sur la meilleure implémentation qui existe,
+     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegment qu'on
+     * doit bien stocker quelque part, mais ça fait le taf c'est ce qui compte.
      *
      * @param size Taille
      *
      * @return Pointeur
      */
-    void* malloc(size_t size __attribute__((unused))) {
-        // TODO
-        return nullptr;
+    void* malloc(u64 size) {
+        // Alignement de la RAM, utile pour meilleures performances sur hardware 64 bits
+
+        u64 remainder = size % 8;
+        size -= remainder;
+
+        if (remainder != 0) {
+            size += 8;
+        }
+
+        std::memory::MemorySegment* currentMemorySegment = std::memory::_firstFreeSegment;
+
+        while (true) {
+            if (currentMemorySegment->length >= size) {
+                // On a trouvé un segment libre
+
+                if (currentMemorySegment->length != size) {
+                    // On va split le segment pour n'allouer que ce qu'il faut
+
+                    MemorySegment* newSegment = (MemorySegment*) ((u64) currentMemorySegment + sizeof(MemorySegment) + size);
+                    newSegment->isFree = true;
+                    newSegment->length = (u64) currentMemorySegment->length - (sizeof(MemorySegment) + size);
+                    newSegment->nextSegment = currentMemorySegment->nextSegment;
+                    newSegment->nextFreeSegment = currentMemorySegment->nextFreeSegment;
+                    newSegment->prevSegment = currentMemorySegment;
+                    newSegment->prevFreeSegment = currentMemorySegment->prevFreeSegment;
+
+                    currentMemorySegment->nextFreeSegment = newSegment;
+                    currentMemorySegment->nextSegment = newSegment;
+                }
+
+                if (currentMemorySegment == _firstFreeSegment) {
+                    // Cas spécial quand 1er segment
+                    _firstFreeSegment = currentMemorySegment->nextFreeSegment;
+                }
+
+                currentMemorySegment->isFree = false;
+                currentMemorySegment->length = size;
+
+                if (currentMemorySegment->prevFreeSegment != nullptr) {
+                    // Changement des segments libres de la liste chainée
+                    currentMemorySegment->prevFreeSegment->nextFreeSegment = currentMemorySegment->nextFreeSegment;
+                }
+
+                if (currentMemorySegment->nextFreeSegment != nullptr) {
+                    // Changement des segments libres de la liste chainée
+                    currentMemorySegment->nextFreeSegment->prevFreeSegment = currentMemorySegment->prevFreeSegment;
+                }
+
+                return currentMemorySegment + 1;
+            }
+
+            if (currentMemorySegment->nextFreeSegment == nullptr) {
+                // Plus de mémoire restante. Normalement impossible, si on arrive ici on doit refaire du paging
+                return nullptr;
+            }
+
+            currentMemorySegment = currentMemorySegment->nextFreeSegment;
+        }
     }
 
     /**
-     * Malloc mais initialise un array à 0
+     * Mémoire initialisée à 0
      *
      * @param nb Nombre d'objets
      * @param size Taille d'un objet
@@ -28,7 +180,46 @@ namespace std::memory {
      * @return Pointeur
      */
     void* calloc(size_t nb, size_t size) {
-        return malloc(nb*size);
+        void* ptr = malloc(nb*size);
+
+        for (u32 i=0; i<nb*size; i++) {
+            ((byte*) ptr)[i] = 0;
+        }
+
+        return ptr;
+    }
+
+    /**
+     * Tableau initialisé à 0
+     *
+     * @tparam T Type
+     * @param nb Nombre de cases
+     *
+     * @return Pointeur
+     */
+    template<typename T>
+    void* calloc(size_t nb) {
+       return calloc(nb, sizeof(T));
+    }
+
+    /**
+     * Tableau initialisé
+     *
+     * @tparam T Type
+     * @param nb Nombre de cases
+     * @param value Valeur pour initialiser
+     *
+     * @return Pointeur
+     */
+    template<typename T>
+    void* calloc(size_t nb, T value) {
+        void* ptr = malloc(nb*sizeof(T));
+
+        for (u32 i=0; i<nb*sizeof(T); i++) {
+            ((T*) ptr)[i] = value;
+        }
+
+        return ptr;
     }
 
     /**
@@ -36,8 +227,41 @@ namespace std::memory {
      *
      * @param ptr Pointeur
      */
-    void free(void *ptr __attribute__((unused))) {
-        // TODO
+    void free(void* ptr) {
+        MemorySegment* currentMemorySegment = ((MemorySegment*) ptr) - 1;
+        currentMemorySegment->isFree = true;
+
+        if (currentMemorySegment < _firstFreeSegment) {
+            _firstFreeSegment = currentMemorySegment;
+        }
+
+        if (currentMemorySegment->nextFreeSegment != nullptr) {
+            if (currentMemorySegment->nextFreeSegment->prevFreeSegment < currentMemorySegment) {
+                currentMemorySegment->nextFreeSegment->prevFreeSegment = currentMemorySegment;
+            }
+        }
+
+        if (currentMemorySegment->prevFreeSegment != nullptr) {
+            if (currentMemorySegment->prevFreeSegment->nextFreeSegment > currentMemorySegment)
+                currentMemorySegment->prevFreeSegment->nextFreeSegment = currentMemorySegment;
+        }
+
+        if (currentMemorySegment->nextSegment != nullptr) {
+            currentMemorySegment->nextSegment->prevSegment = currentMemorySegment;
+
+            if (currentMemorySegment->nextSegment->isFree) {
+                // Évite la fragmentation
+                combineFreeSegments(currentMemorySegment, currentMemorySegment->nextSegment);
+            }
+        }
+
+        if (currentMemorySegment->prevSegment != nullptr) {
+            currentMemorySegment->prevSegment->nextSegment = currentMemorySegment;
+            if (currentMemorySegment->prevSegment->isFree) {
+                // Évite la fragmentation
+                combineFreeSegments(currentMemorySegment, currentMemorySegment->prevSegment);
+            }
+        }
     }
 
     /**

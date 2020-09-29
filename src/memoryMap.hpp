@@ -6,6 +6,9 @@
 
 #include "types.hpp"
 
+/**
+ * Nombre de régions
+ */
 extern u8 _memoryRegionCount;
 
 namespace std::memory {
@@ -44,37 +47,62 @@ namespace std::memory {
     };
 
     namespace {
-        MemoryMapEntry* usableMemoryRegions[10];
-        bool memoryRegionsCalculated = false;
-        u8 usableRegionsIndex = 0;
+        /**
+         * Liste des régions
+         */
+        MemoryMapEntry* _usableMemoryRegions[10];
+
+        /**
+         * Régions déjà calculées ou non
+         */
+        bool _memoryRegionsCalculated = false;
+
+        /**
+         * Index des régions utilisables
+         */
+        u8 _usableRegionsIndex = 0;
     }
 
+    /**
+     * @return Nombre de régions RAM
+     */
     u8 getMemoryRegionCount() {
         return _memoryRegionCount;
     }
 
+    /**
+     * @return Nombre de régions utilisables
+     */
     u8 getNumberOfUsableMemoryRegions() {
-        return usableRegionsIndex;
+        return _usableRegionsIndex;
     }
 
+    /**
+     * @return Régions utilisables
+     */
     MemoryMapEntry** getUsableMemoryRegions() {
-        if (!memoryRegionsCalculated) {
-            memoryRegionsCalculated = true;
+        if (!_memoryRegionsCalculated) {
+            _memoryRegionsCalculated = true;
 
             for (u8 i = 0; i < _memoryRegionCount; i++) {
                 MemoryMapEntry* entry = (MemoryMapEntry*) 0x5000;
                 entry += i;
 
                 if (entry->regionType == 1) {
-                    usableMemoryRegions[usableRegionsIndex] = entry;
-                    usableRegionsIndex++;
+                    _usableMemoryRegions[_usableRegionsIndex] = entry;
+                    _usableRegionsIndex++;
                 }
             }
         }
 
-        return usableMemoryRegions;
+        return _usableMemoryRegions;
     }
 
+    /**
+     * Affiche une région
+     *
+     * @param entry Memory map entry
+     */
     void printMemoryMap(MemoryMapEntry* entry) {
         std::IO::printString("Memory base: \t\t", "");
         std::IO::printInt(entry->baseAddress);
@@ -87,6 +115,31 @@ namespace std::memory {
 
         std::IO::printString("Memory attributes: \t", "");
         std::IO::printHex(entry->extendedAttributes);
+    }
+
+    /**
+     * Affiche toutes les régions
+     */
+    void printAllMemoryMapEntries() {
+        for (u8 i=0; i<std::memory::getMemoryRegionCount(); i++) {
+            std::memory::MemoryMapEntry* entry = (std::memory::MemoryMapEntry*) 0x5000;
+            entry += i;
+            std::memory::printMemoryMap(entry);
+            std::IO::printString();
+        }
+    }
+
+    /**
+     * Affiche toutes les régions utilisables
+     */
+    void printUsableMemoryMapEntries() {
+        std::memory::MemoryMapEntry** usableMemoryMap = std::memory::getUsableMemoryRegions();
+
+        for (u8 i=0; i<std::memory::getNumberOfUsableMemoryRegions(); i++) {
+            std::memory::MemoryMapEntry* entry = usableMemoryMap[i];
+            std::memory::printMemoryMap(entry);
+            std::IO::printString();
+        }
     }
 }
 
