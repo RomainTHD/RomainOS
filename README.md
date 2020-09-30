@@ -2,8 +2,7 @@
 
 Une idée à la con mais vlà mon OS, from scratch, en 64 bits, à base d'assembleur et de C++ !
 
-<img src="https://image.noelshack.com/fichiers/2016/24/1466366192-risitas8.png" />
-
+<img src="https://image.noelshack.com/fichiers/2016/24/1466366192-risitas8.png" alt="Hard" /> <br>
 <sub><i>My face when j'ai découvert que c'était compliqué l'assembleur lol</i></sub>
 
 ### Comment que c'est fait tout ça
@@ -19,9 +18,11 @@ Les informations du CPU sont accessibles, les long int (64 bits) sont activés, 
 
 Après ça, les SSE sont activés pour utiliser les nombres flottants dans le kernel.
 
-Enfin, la méthode <code>_start</code> de <code>src/kernel.cpp</code> est appelée, chargeant le kernel C++ à proprement parler.
+Pour finir en assembleur, la méthode <code>_start</code> de <code>src/kernel.cpp</code> est appelée, chargeant le kernel C++ à proprement parler.
 
-Maintenant, en C++ maintenant, le curseur est instancié, les interruptions clavier (IDT) initialisées, le layout du clavier set,
+En C++ maintenant, le curseur est instancié, les interruptions clavier (IDT) initialisées, le layout du clavier set,
 et les régions utilisables en mémoire récupérées. 
 
-Et après tout ça, le noyau est ready !<br><img src="https://image.noelshack.com/fichiers/2018/18/5/1525431412-macron2.png" />
+Et après tout ça, le noyau est ready !
+
+<img src="https://image.noelshack.com/fichiers/2018/18/5/1525431412-macron2.png" alt="Ready" />

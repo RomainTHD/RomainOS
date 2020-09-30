@@ -6,7 +6,7 @@ mov [BOOT_DISK], dl
 
 ; Création du stack, début à 0x7c00
 mov bp, 0x7c00
-; Stack pointer, current mem adress
+; Stack pointer, current mem address
 mov sp, bp
 
 call readDisk

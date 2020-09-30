@@ -18,7 +18,7 @@ SECTIONS {
 
     .text : ALIGN(0x1000) {
         *(.text)
-        *(.rodata)
+        *(.rodata*)
     }
 
     /* Pour les interruptions */

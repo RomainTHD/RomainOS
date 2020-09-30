@@ -56,36 +56,34 @@ namespace std::IO {
         bool shift;
     };
 
+    /**
+     * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
+     */
     namespace {
         /**
-         * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
+         * Layout actuel
          */
-        namespace {
-            /**
-             * Layout actuel
-             */
-            KeyboardLayout _keyboardLayout = AZERTY;
+        KeyboardLayout _keyboardLayout = AZERTY;
 
-            /**
-             * Est en ctrl ou non
-             */
-            bool _isCtrl = false;
+        /**
+         * Est en ctrl ou non
+         */
+        bool _isCtrl = false;
 
-            /**
-             * Est en alt ou non
-             */
-            bool _isAlt = false;
+        /**
+         * Est en alt ou non
+         */
+        bool _isAlt = false;
 
-            /**
-             * Est en shift ou non
-             */
-            bool _isShift = false;
+        /**
+         * Est en shift ou non
+         */
+        bool _isShift = false;
 
-            /**
-             * Est en caps lock ou non
-             */
-            bool _isCapsLock = false;
-        }
+        /**
+         * Est en caps lock ou non
+         */
+        bool _isCapsLock = false;
     }
 
     /**
