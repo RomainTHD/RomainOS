@@ -159,6 +159,14 @@ namespace std::memory {
                     currentMemorySegment->nextFreeSegment->prevFreeSegment = currentMemorySegment->prevFreeSegment;
                 }
 
+                if (currentMemorySegment->prevSegment != nullptr) {
+                    currentMemorySegment->prevSegment->nextFreeSegment = currentMemorySegment->nextFreeSegment;
+                }
+
+                if (currentMemorySegment->nextSegment != nullptr) {
+                    currentMemorySegment->nextSegment->prevFreeSegment = currentMemorySegment->prevFreeSegment;
+                }
+
                 return currentMemorySegment + 1;
             }
 
