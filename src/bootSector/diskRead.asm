@@ -9,7 +9,8 @@ readDisk:
     mov bx, PROGRAM_SPACE
 
     ; Nombre de secteurs de 512 bytes du disque
-    %include "diskReadSegments.asm"
+    ; %include "diskReadSegments.asm"
+    mov al, 127
 
     ; Quel disque choisir
     mov dl, [BOOT_DISK]
@@ -23,11 +24,42 @@ readDisk:
     ; Lecture à partir du 2e secteur, le 1er étant le boot sector
     mov cl, 0x02
 
-    ; Interruption BIOS pour lire
-    int 0x13
+    diskReadLoop:
+            ; push ax
+            ; push bx
+            ; push cx
+            ; push dx
 
-    ; Jmp if carry set (= erreur disque)
-    jc diskReadError
+            ; Interruption BIOS pour lire
+            int 0x13
+
+            ; pop dx
+            ; pop cx
+            ; pop bx
+            ; pop ax
+
+            ; Bon, l'avenir nous dira si ce code était une erreur ou non...
+            ; Jmp if carry set (= erreur disque)
+            jc diskReadExit
+            ; Autre possibilité:
+            ; jc diskReadError
+
+            ; Écriture des 512 bytes suivants
+            add bx, 512
+            ; Lecture secteur suivant
+            inc cx
+
+             ; limite de 512 secteurs
+            cmp cl, 512
+            je diskReadExit
+
+            jmp diskReadLoop
+
+    diskReadExit:
+        ; pop dx
+        ; pop cx
+        ; pop bx
+        ; pop ax
 
     ret
 
