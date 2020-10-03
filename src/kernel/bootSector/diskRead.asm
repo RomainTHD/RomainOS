@@ -49,8 +49,8 @@ readDisk:
             ; Lecture secteur suivant
             inc cx
 
-             ; limite de 512 secteurs
-            cmp cl, 512
+             ; limite de 255 secteurs
+            cmp cl, 255
             je diskReadExit
 
             jmp diskReadLoop
