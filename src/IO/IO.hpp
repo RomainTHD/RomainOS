@@ -8,7 +8,7 @@
 
 namespace std::IO {
     /**
-     * Transfère de la data à travers les ports
+     * Transfère de la data à travers les ports sur un octet
      *
      * @param port Port utilisé. Compris entre 0x03b0 et 0x03df pour du VGA
      * @param val Valeur à transférer
@@ -18,6 +18,16 @@ namespace std::IO {
     void outb(u16 port, byte val) {
         // Volatile pour empêcher le compilateur d'optimiser
         asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
+    }
+
+    /**
+     * Transfère de la data à travers les ports sur deux octets
+     *
+     * @param port Port utilisé
+     * @param val Valeur à transférer
+     */
+    void outw(u16 port, u16 val) {
+        asm volatile ("outw %0, %1" : : "a"(val), "Nd"(port));
     }
 
     /**
