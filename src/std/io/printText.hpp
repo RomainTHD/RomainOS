@@ -4,11 +4,11 @@
 #ifndef ROMAINOS_PRINTTEXT_HPP
 #define ROMAINOS_PRINTTEXT_HPP
 
-#include "types.hpp"
-#include "string.hpp"
+#include <types.hpp>
+#include <string.hpp>
 
-#include "IO/IO.hpp"
-#include "IO/textColorModes.hpp"
+#include "rawIO.hpp"
+#include "textColorModes.hpp"
 
 /**
  * Emplacement VRAM
@@ -30,7 +30,7 @@
  */
 #define TAB_LENGTH 4
 
-namespace std::IO {
+namespace std::io {
     namespace {
         /**
          * Position du curseur
@@ -46,10 +46,10 @@ namespace std::IO {
     void setCursorPosition(u16 pos) {
         pos %= (VGA_WIDTH * VGA_HEIGHT);
 
-        std::IO::outb(0x3d4, 0x0f);
-        std::IO::outb(0x3d5, (byte) (pos & (u16) 0xff));
-        std::IO::outb(0x3d4, 0x0e);
-        std::IO::outb(0x3d5, (byte) ((u16) (pos >> (u16) 8) & (u16) 0xff));
+        std::io::outb(0x3d4, 0x0f);
+        std::io::outb(0x3d5, (byte) (pos & (u16) 0xff));
+        std::io::outb(0x3d4, 0x0e);
+        std::io::outb(0x3d5, (byte) ((u16) (pos >> (u16) 8) & (u16) 0xff));
 
         _cursorPosition = pos;
     }

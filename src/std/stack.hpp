@@ -4,7 +4,7 @@
 #ifndef ROMAINOS_STACK_HPP
 #define ROMAINOS_STACK_HPP
 
-#include "types.hpp"
+#include <types.hpp>
 
 /**
  * Stack

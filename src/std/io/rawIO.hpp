@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 09/09/2020.
 
-#ifndef ROMAINOS_IO_HPP
-#define ROMAINOS_IO_HPP
+#ifndef ROMAINOS_RAWIO_HPP
+#define ROMAINOS_RAWIO_HPP
 
-#include "types.hpp"
+#include <types.hpp>
 
-namespace std::IO {
+namespace std::io {
     /**
      * Transfère de la data à travers les ports sur un octet
      *
@@ -16,7 +16,7 @@ namespace std::IO {
      * @see https://wiki.osdev.org/I/O_Ports#The_list
      */
     void outb(u16 port, byte val) {
-        // Volatile pour empêcher le compilateur d'optimiser
+        // Volatile pour empêcher le compilateur io'optimiser
         asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
     }
 
@@ -50,4 +50,4 @@ namespace std::IO {
         return res;
     }
 }
-#endif //ROMAINOS_IO_HPP
+#endif //ROMAINOS_RAWIO_HPP

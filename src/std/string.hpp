@@ -4,8 +4,8 @@
 #ifndef ROMAINOS_STRING_HPP
 #define ROMAINOS_STRING_HPP
 
-#include "types.hpp"
-#include "stack.hpp"
+#include <types.hpp>
+#include <stack.hpp>
 
 /**
  * Récupère la taille d'une string

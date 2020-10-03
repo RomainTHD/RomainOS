@@ -8,7 +8,7 @@
 
 #include "keyboardLayouts/AZERTY.hpp"
 
-namespace std::IO {
+namespace std::io {
     /**
      * Différents layouts
      */
@@ -163,7 +163,7 @@ namespace std::IO {
      */
     void handleEvent(byte b) {
         KeyEvent event = getEvent(b);
-        std::IO::printChar(event.key);
+        std::io::printChar(event.key);
 
         if (event.keyCode == VK_ESC) {
             std::system::shutdownAndPrint();

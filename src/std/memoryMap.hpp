@@ -4,7 +4,8 @@
 #ifndef ROMAINOS_MEMORYMAP_HPP
 #define ROMAINOS_MEMORYMAP_HPP
 
-#include "types.hpp"
+#include <types.hpp>
+#include <io/IO.hpp>
 
 /**
  * Nombre de régions
@@ -104,17 +105,17 @@ namespace std::memory {
      * @param entry Memory map entry
      */
     void printMemoryMap(MemoryMapEntry* entry) {
-        std::IO::printString("Memory base: \t\t", "");
-        std::IO::printInt(entry->baseAddress);
+        std::io::printString("Memory base: \t\t", "");
+        std::io::printInt(entry->baseAddress);
 
-        std::IO::printString("Memory length: \t\t", "");
-        std::IO::printInt(entry->regionLength);
+        std::io::printString("Memory length: \t\t", "");
+        std::io::printInt(entry->regionLength);
 
-        std::IO::printString("Memory type: \t\t", "");
-        std::IO::printHex(entry->regionType);
+        std::io::printString("Memory type: \t\t", "");
+        std::io::printHex(entry->regionType);
 
-        std::IO::printString("Memory attributes: \t", "");
-        std::IO::printHex(entry->extendedAttributes);
+        std::io::printString("Memory attributes: \t", "");
+        std::io::printHex(entry->extendedAttributes);
     }
 
     /**
@@ -125,7 +126,7 @@ namespace std::memory {
             std::memory::MemoryMapEntry* entry = (std::memory::MemoryMapEntry*) 0x5000;
             entry += i;
             std::memory::printMemoryMap(entry);
-            std::IO::printString();
+            std::io::printString();
         }
     }
 
@@ -138,7 +139,7 @@ namespace std::memory {
         for (u8 i=0; i<std::memory::getNumberOfUsableMemoryRegions(); i++) {
             std::memory::MemoryMapEntry* entry = usableMemoryMap[i];
             std::memory::printMemoryMap(entry);
-            std::IO::printString();
+            std::io::printString();
         }
     }
 }

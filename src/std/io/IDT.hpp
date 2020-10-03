@@ -9,10 +9,11 @@
 #ifndef ROMAINOS_IDT_HPP
 #define ROMAINOS_IDT_HPP
 
-#include "types.hpp"
+#include <types.hpp>
+
 #include "keyboard.hpp"
 
-namespace std::IO::IDT {
+namespace std::io::idt {
     /**
      * Interrupt Descriptor Tables
      */
@@ -57,14 +58,14 @@ namespace std::IO::IDT {
 /**
  * IDT
  */
-extern std::IO::IDT::IDT64 _idt[256];
+extern std::io::idt::IDT64 _idt[256];
 
 /**
  * Routine assembleur keyboard
  */
 extern uint64_t _isr1;
 
-namespace std::IO::IDT {
+namespace std::io::idt {
     /**
      * Active les IDT
      */
@@ -106,7 +107,7 @@ namespace std::IO::IDT {
         outb(0x20, 0x20);
         outb(0xa0, 0x20);
 
-        std::IO::handleEvent(b);
+        std::io::handleEvent(b);
     }
 }
 
