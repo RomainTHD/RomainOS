@@ -24,8 +24,8 @@ compileAsm:
 compileCPP:
 	echo "Compilation C/C++..."
 
-	cd ./src && \
-	$(GCC_PATH) -Ttext 0x8000 \
+	cd ./src && $(GCC_PATH) \
+				-Ttext 0x8000 \
 				-ffreestanding \
 				-mno-red-zone \
 				-m64 \
@@ -40,20 +40,20 @@ compileCPP:
 				-c kernel/kernel.cpp \
 				-o ../bin/part/kernel.o
 
-	# -Ttext 0x8000				Set la section .text à 0x8000, pour situer le main
-	# -ffreestanding			La lib standard n'existe pas, et main n'est pas le point io'entrée
-	# -mno-red-zone				Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
-	# -m64						Génère du code pour 64 bits
-	# -save-temps=obj			Exporte les .cpp en assembleur dans le même dossier que les .o
-	# -Wall						Toutes les erreurs
-	# -Wextra					Extra erreurs
-	# -pedantic					Erreurs en plus
-	# -Wno-write-strings		Disable le warning pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
-	# -std=c++1z				C++ 17
-	# -I .						Dossier d'include pour les .hpp
-	# -I ./std					Dossier d'include pour les .hpp : std
-	# -c kernel/kernel.cpp				Source
-	# -o ../bin/part/kernel.o	Output
+	# -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
+	# -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
+	# -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
+	# -m64                      Génère du code pour 64 bits
+	# -save-temps=obj           Exporte les .cpp en assembleur dans le même dossier que les .o
+	# -Wall                     Toutes les erreurs
+	# -Wextra                   Extra erreurs
+	# -pedantic                 Erreurs en plus
+	# -Wno-write-strings        Disable le warning pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
+	# -std=c++1z                C++ 17
+	# -I .                      Dossier d'include pour les .hpp
+	# -I ./std                  Dossier d'include pour les .hpp : std
+	# -c kernel/kernel.cpp      Source
+	# -o ../bin/part/kernel.o   Output
 
 link:
 	echo "Linker..."
@@ -73,10 +73,7 @@ calcNbSeg:
 
 run:
 	echo "Exécution bootloader..."
-	qemu-system-x86_64 \
-				-m 64 \
-				-drive format=raw,file=./bin/OS/RomainOS.bin \
-				--no-reboot
+	qemu-system-x86_64 -drive format=raw,file=./bin/OS/RomainOS.bin --no-reboot
 
 iso: build
 	dd bs=512 count=2880 if=/dev/zero of=./bin/part/disk.img
