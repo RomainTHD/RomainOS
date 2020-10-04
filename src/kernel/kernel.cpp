@@ -7,7 +7,7 @@
 #include <memory.hpp>
 
 /**
- * Point io'entrée de l'OS
+ * Point d'entrée de l'OS
  */
 extern "C" void _start() {
     std::io::clearScreen();
@@ -16,5 +16,5 @@ extern "C" void _start() {
     std::io::setKeyboardLayout(std::io::AZERTY);
     std::memory::initHeap(0x100000, 0x100000);
 
-    std::io::printString("Tout fonctionne !\n", nullptr, BG_RED | FG_WHITE);
+    std::io::printString("Tout fonctionne !", "\n", BG_RED | FG_WHITE);
 }

@@ -166,7 +166,7 @@ namespace std::time {
      *
      * @param scale Temps
      */
-    void sleep(const TimeScale& scale) {
+    void sleep(_In_ const TimeScale& scale) {
         for (u64 i=0; i<scale.toMicro()*4; i++) {
             asm ("nop");
         }

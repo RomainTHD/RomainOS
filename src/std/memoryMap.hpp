@@ -104,7 +104,7 @@ namespace std::memory {
      *
      * @param entry Memory map entry
      */
-    void printMemoryMap(MemoryMapEntry* entry) {
+    void printMemoryMap(_In_ const MemoryMapEntry* entry) {
         std::io::printString("Memory base: \t\t", "");
         std::io::printInt(entry->baseAddress);
 

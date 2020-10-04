@@ -128,7 +128,7 @@ namespace std::io {
      * @param str String
      * @param color Couleur
      */
-    void printString(const char *str = "", char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printString(_In_ const char *str = "", _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
         if (str == nullptr) {
             u16 c = getCursorPosition();
             setCursorPosition(-1, -1);
@@ -190,7 +190,7 @@ namespace std::io {
      * @param color Couleur
      */
     template <typename T>
-    void printInt(T value, char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printInt(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
         printString(intToString(value), end, color);
     }
 
@@ -203,7 +203,7 @@ namespace std::io {
      * @param color Couleur
      */
     template <typename T>
-    void printFloat(T value, char* end = "\n", u8 decimalPlaces = 3, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printFloat(T value, _In_ const char* end = "\n", u8 decimalPlaces = 3, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
         printString(floatToString(value, decimalPlaces), end, color);
     }
 
@@ -216,7 +216,7 @@ namespace std::io {
      * @param color Couleur
      */
     template <typename T>
-    void printHex(T value, char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printHex(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
         printString(hexToString(value), end, color);
     }
 }

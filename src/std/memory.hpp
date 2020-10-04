@@ -49,7 +49,7 @@ namespace std::memory {
          * @param segA Segment A
          * @param segB Segment B
          */
-        void combineFreeSegments(MemorySegment* segA, MemorySegment* segB) {
+        void combineFreeSegments(_Inout_ MemorySegment* segA, _Inout_ MemorySegment* segB) {
             if (segA == nullptr) {
                 return;
             }
@@ -190,7 +190,7 @@ namespace std::memory {
      * @return Tableau
      */
     template<typename T>
-    T* memset(void* ptr, T value, u64 nb) {
+    T* memset(_Out_ void* ptr, T value, u64 nb) {
         for (u64 i=0; i<nb; i++) {
             ((T*) ptr)[i] = value;
         }
@@ -206,7 +206,7 @@ namespace std::memory {
      *
      * @return Tableau
      */
-    void* memset(void* ptr, int value, u64 nb) {
+    void* memset(_Out_ void* ptr, int value, u64 nb) {
         return memset<byte>(ptr, value, nb);
     }
 
@@ -240,7 +240,7 @@ namespace std::memory {
      *
      * @param ptr Pointeur
      */
-    void free(void* ptr) {
+    void free(_Out_ void* ptr) {
         MemorySegment* currentMemorySegment = ((MemorySegment*) ptr) - 1;
         currentMemorySegment->isFree = true;
 
