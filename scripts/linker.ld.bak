@@ -3,13 +3,14 @@ OUTPUT_FORMAT(binary)
 ENTRY(_start)
 
 INPUT (
-    extendedProgram.o
-    kernel.o
-    binaries.o
+    ./obj/binaries.o
+    ./obj/extendedProgram.o
+    ./obj/test.o
+    ./obj/kernel/kernel.o
 )
 
 OUTPUT (
-    kernel.bin
+    ./bin/part/kernel.bin
 )
 
 SECTIONS {

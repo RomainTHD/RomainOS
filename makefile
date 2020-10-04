@@ -3,13 +3,36 @@ MAKEFLAGS += --silent
 GCC_PATH = "$$HOME"/opt/cross/bin/x86_64-elf-g++
 LINKER_PATH = "$$HOME"/opt/cross/bin/x86_64-elf-ld
 
+SRCDIR := ./src
+OBJDIR := ./obj
+DEPDIR := dep
+SRCS   := $(shell find $(SRCDIR) -name "*.cpp")
+OBJS     := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+DEPS     := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
+TREE     := $(patsubst %/,%,$(dir $(OBJS)))
+CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./src -I ./src/std
+# -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
+# -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
+# -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
+# -m64                      Génère du code pour 64 bits
+# -save-temps=obj           Exporte les .cpp en assembleur dans le même dossier que les .o
+# -Wall                     Toutes les erreurs
+# -Wextra                   Extra erreurs
+# -pedantic                 Erreurs en plus
+# -Wno-write-strings        Disable le warning pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
+# -std=c++1z                C++ 17
+# -I ./src                  Dossier d'include pour les .hpp
+# -I ./src/std              Dossier d'include pour les .hpp : std
+
 all: clean build run
 
 build: compileAsm compileCPP link merge calcNbSeg
 
 clean:
-	rm -r bin/part
-	mkdir bin/part
+	rm -r ./obj
+	mkdir ./obj
+	rm -r ./bin/part
+	mkdir ./bin/part
 
 compileAsm:
 	echo "Compilation bootloader..."
@@ -18,47 +41,28 @@ compileAsm:
 
 	echo "Compilation secteurs suivants..."
 	cd ./src/kernel/secondSector && \
-	nasm ./extendedProgram.asm -f elf64 -i ../bootSector/ -o ../../../bin/part/extendedProgram.o -w+orphan-labels  && \
-	nasm ./binaries.asm -f elf64 -o ../../../bin/part/binaries.o -w+orphan-labels
+	nasm ./extendedProgram.asm -f elf64 -i ../bootSector/ -o ../../../obj/extendedProgram.o -w+orphan-labels  && \
+	nasm ./binaries.asm -f elf64 -o ../../../obj/binaries.o -w+orphan-labels
 
-compileCPP:
+compileCPP: _beforeCompilationCPP $(OBJS) _afterCompilationCPP
+
+_beforeCompilationCPP:
 	echo "Compilation C/C++..."
 
-	cd ./src && $(GCC_PATH) \
-				-Ttext 0x8000 \
-				-ffreestanding \
-				-mno-red-zone \
-				-m64 \
-				-save-temps=obj \
-				-Wall \
-				-Wextra \
-				-pedantic \
-				-Wno-write-strings \
-				-std=c++1z \
-				-I . \
-				-I ./std \
-				-c kernel/kernel.cpp \
-				-o ../bin/part/kernel.o
+.SECONDEXPANSION:
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $$(@D)
+	$(GCC_PATH) $(CPPFLAGS) -o $@ -c $<
 
-	# -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
-	# -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
-	# -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
-	# -m64                      Génère du code pour 64 bits
-	# -save-temps=obj           Exporte les .cpp en assembleur dans le même dossier que les .o
-	# -Wall                     Toutes les erreurs
-	# -Wextra                   Extra erreurs
-	# -pedantic                 Erreurs en plus
-	# -Wno-write-strings        Disable le warning pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
-	# -std=c++1z                C++ 17
-	# -I .                      Dossier d'include pour les .hpp
-	# -I ./std                  Dossier d'include pour les .hpp : std
-	# -c kernel/kernel.cpp      Source
-	# -o ../bin/part/kernel.o   Output
+$(TREE): %:
+	mkdir -p $@
+	mkdir -p $(@:$(OBJDIR)%=$(DEPDIR)%)
+
+_afterCompilationCPP:
+	python3 ./scripts/editLinker.py
 
 link:
 	echo "Linker..."
-	cd ./bin/part && \
-	$(LINKER_PATH) -T "../../linker.ld"
+	$(LINKER_PATH) -T "./scripts/linker.ld"
 
 merge:
 	echo "Fusion des fichiers binaires..."
