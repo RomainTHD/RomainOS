@@ -180,6 +180,37 @@ namespace std::memory {
     }
 
     /**
+     * Set un tableau et le modifie
+     *
+     * @tparam T Type d'une case
+     * @param ptr Pointeur
+     * @param value Valeur
+     * @param nb Nombre de cases à set
+     *
+     * @return Tableau
+     */
+    template<typename T>
+    T* memset(void* ptr, T value, u64 nb) {
+        for (u64 i=0; i<nb; i++) {
+            ((T*) ptr)[i] = value;
+        }
+        return (T*) ptr;
+    }
+
+    /**
+     * Set un tableau et le modifie
+     *
+     * @param ptr Pointeur
+     * @param value Valeur
+     * @param nb Nombre de cases à set
+     *
+     * @return Tableau
+     */
+    void* memset(void* ptr, int value, u64 nb) {
+        return memset<byte>(ptr, value, nb);
+    }
+
+    /**
      * Mémoire initialisée à 0
      *
      * @param nb Nombre d'objets
@@ -188,13 +219,7 @@ namespace std::memory {
      * @return Pointeur
      */
     void* calloc(size_t nb, size_t size) {
-        void* ptr = malloc(nb*size);
-
-        for (u32 i=0; i<nb*size; i++) {
-            ((byte*) ptr)[i] = 0;
-        }
-
-        return ptr;
+        return memset(malloc(nb*size), 0, nb);
     }
 
     /**
@@ -206,28 +231,8 @@ namespace std::memory {
      * @return Pointeur
      */
     template<typename T>
-    void* calloc(size_t nb) {
-       return calloc(nb, sizeof(T));
-    }
-
-    /**
-     * Tableau initialisé
-     *
-     * @tparam T Type
-     * @param nb Nombre de cases
-     * @param value Valeur pour initialiser
-     *
-     * @return Pointeur
-     */
-    template<typename T>
-    void* calloc(size_t nb, T value) {
-        void* ptr = malloc(nb*sizeof(T));
-
-        for (u32 i=0; i<nb*sizeof(T); i++) {
-            ((T*) ptr)[i] = value;
-        }
-
-        return ptr;
+    T* calloc(size_t nb) {
+        return memset<T>(malloc(nb*sizeof(T)), 0, nb);
     }
 
     /**
