@@ -10,7 +10,8 @@ SRCS   := $(shell find $(SRCDIR) -name "*.cpp")
 OBJS     := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
 DEPS     := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
 TREE     := $(patsubst %/,%,$(dir $(OBJS)))
-CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./src -I ./src/std
+
+CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./include -I ./include/std
 # -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
 # -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
 # -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc

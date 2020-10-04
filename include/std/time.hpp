@@ -17,17 +17,17 @@ namespace std::time {
          *
          * @param micro Microsecondes
          */
-        explicit TimeScale(u64 micro) : _micro(micro) {}
+        explicit TimeScale(u64 micro);
 
         /**
          * Constructeur
          */
-        TimeScale() : TimeScale(0) {}
+        TimeScale();
 
         /**
          * Destructeur
          */
-        ~TimeScale() = default;
+        ~TimeScale();
 
         /**
          * Constructeur depuis secondes
@@ -36,9 +36,7 @@ namespace std::time {
          *
          * @return TimeScale
          */
-        static TimeScale fromSec(u32 s) {
-            return TimeScale(s*10e6);
-        }
+        static TimeScale fromSec(u32 s);
 
         /**
          * Constructeur depuis millisecondes
@@ -47,9 +45,7 @@ namespace std::time {
          *
          * @return TimeScale
          */
-        static TimeScale fromMilli(u32 ms) {
-            return TimeScale(ms*10e3);
-        }
+        static TimeScale fromMilli(u32 ms);
 
         /**
          * Constructeur depuis microsecondes
@@ -58,30 +54,22 @@ namespace std::time {
          *
          * @return TimeScale
          */
-        static TimeScale fromMicro(u64 micro) {
-            return TimeScale(micro);
-        }
+        static TimeScale fromMicro(u64 micro);
 
         /**
          * @return To microseconds
          */
-        [[nodiscard]] u64 toMicro() const {
-            return _micro;
-        }
+        [[nodiscard]] u64 toMicro() const;
 
         /**
          * @return To milliseconds
          */
-        [[nodiscard]] u32 toMilli() const {
-            return toMicro() / 10e3;
-        }
+        [[nodiscard]] u32 toMilli() const;
 
         /**
          * @return To seconds
          */
-        [[nodiscard]] u32 toSec() const {
-            return toMicro() / 10e6;
-        }
+        [[nodiscard]] u32 toSec() const;
 
         /**
          * Set selon secondes
@@ -90,10 +78,7 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& setSec(u32 sec) {
-            setMicro(sec*10e6);
-            return *this;
-        }
+        TimeScale& setSec(u32 sec);
 
         /**
          * Set selon millisecondes
@@ -102,10 +87,7 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& setMilli(u32 ms) {
-            setMicro(ms*10e3);
-            return *this;
-        }
+        TimeScale& setMilli(u32 ms);
 
         /**
          * Set selon microsecondes
@@ -114,10 +96,7 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& setMicro(u64 micro) {
-            this->_micro = micro;
-            return *this;
-        }
+        TimeScale& setMicro(u64 micro);
 
         /**
          * Ajoute des secondes
@@ -126,10 +105,7 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& addSec(u32 sec) {
-            setMicro(toMicro() + sec*10e6);
-            return *this;
-        }
+        TimeScale& addSec(u32 sec);
 
         /**
          * Ajoute des millisecondes
@@ -138,10 +114,7 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& addMilli(u32 ms) {
-            setMicro(toMicro() + ms*10e3);
-            return *this;
-        }
+        TimeScale& addMilli(u32 ms);
 
         /**
          * Ajoute des microsecondes
@@ -150,10 +123,8 @@ namespace std::time {
          *
          * @return TimeScale modifiée
          */
-        TimeScale& addMicro(u64 micro) {
-            setMicro(toMicro() + micro);
-            return *this;
-        }
+        TimeScale& addMicro(u64 micro);
+
     private:
         /**
          * Microsecondes
@@ -166,11 +137,7 @@ namespace std::time {
      *
      * @param scale Temps
      */
-    void sleep(_In_ const TimeScale& scale) {
-        for (u64 i=0; i<scale.toMicro()*4; i++) {
-            asm ("nop");
-        }
-    }
+    void sleep(_In_ const TimeScale& scale);
 
     /**
      * Sleep
@@ -178,9 +145,7 @@ namespace std::time {
      * @param s Secondes
      * @param micro Microsecondes
      */
-    void sleep(u32 s, u32 micro = 0) {
-        sleep(TimeScale::fromSec(s).addMicro(micro));
-    }
+    void sleep(u32 s, u32 micro = 0);
 }
 
 #endif //ROMAINOS_TIME_HPP

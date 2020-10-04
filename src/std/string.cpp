@@ -1,18 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 10/09/2020.
 
-#ifndef ROMAINOS_STRING_HPP
-#define ROMAINOS_STRING_HPP
+#include <string.hpp>
 
-#include <types.hpp>
-#include <stack.hpp>
-
-/**
- * Récupère la taille d'une string
- *
- * @param s String
- * @return Taille
- */
 u32 getLength(const char* s) {
     u32 size = 0;
     const char* ptr = s;
@@ -29,66 +19,6 @@ u32 getLength(const char* s) {
     return size;
 }
 
-/**
- * String
- */
-class string {
-public:
-    string() = delete;
-
-    /**
-     * Constructeur
-     *
-     * @param s Chaine
-     */
-    explicit string(const char* s) {
-        this->_s = s;
-        this->_length = getLength(s);
-    }
-
-    /**
-     * Destructeur
-     */
-    ~string() = default;
-
-    /**
-     * Taille
-     *
-     * @return Taille
-     */
-    [[nodiscard]] u32 length() const {
-        return this->_length;
-    }
-
-    /**
-     * To char*
-     *
-     * @return Pointeur
-     */
-    [[nodiscard]] const char* toChar() const {
-        return this->_s;
-    }
-
-private:
-    /**
-     * Chaine
-     */
-    const char* _s;
-
-    /**
-     * Taille
-     */
-    u32 _length;
-};
-
-/**
- * Hex to String
- *
- * @tparam T Type
- * @param value Valeur
- *
- * @return Hex
- */
 template<typename T>
 const char* hexToString(T value) {
     static char hexToStringOutput[128];
@@ -102,7 +32,7 @@ const char* hexToString(T value) {
     u8 size = ((sizeof(T)) * 2 - 1);
 
     for (u8 i = 0; i < size; i++) {
-        ptr = ((u8 *)valPtr + i);
+        ptr = ((u8*)valPtr + i);
         temp = ((*ptr & 0xf0) >> 4);
         hexToStringOutput[size - (i * 2 + 1)] = temp + (temp > 9 ? 55 : 48);
         temp = ((*ptr & 0x0f));
@@ -114,14 +44,6 @@ const char* hexToString(T value) {
     return hexToStringOutput;
 }
 
-/**
- * Int vers string
- *
- * @tparam T Type
- * @param value Int
- *
- * @return String de l'int
- */
 template<typename T>
 const char* intToString(T value) {
     bool isNegative = false;
@@ -165,31 +87,13 @@ const char* intToString(T value) {
     return integerToStringOutput;
 }
 
-/**
- * Hack pour utiliser intToString sur des pointeurs.
- * Le <code>value *= -1;</code> ne passe en effet pas pour des pointeurs.
- *
- * @tparam T Type
- * @param value Int*
- *
- * @return String de l'int
- */
 template<typename T>
 const char* intToString(T* value) {
     return intToString((u64) value);
 }
 
-/**
- * Float to string
- *
- * @tparam T Type
- * @param value Value
- * @param decimalPlaces Nb de décimales
- *
- * @return String de float
- */
 template <typename T>
-const char* floatToString(T value, u8 decimalPlaces = 3) {
+const char* floatToString(T value, u8 decimalPlaces) {
     static char floatToStringOutput[128];
     char *intPtr = (char*) intToString((int) value);
     char *floatPtr = floatToStringOutput;
@@ -222,4 +126,12 @@ const char* floatToString(T value, u8 decimalPlaces = 3) {
     return floatToStringOutput;
 }
 
-#endif //ROMAINOS_STRING_HPP
+template const char* hexToString(u32 value);
+
+template const char* intToString(u32 value);
+template const char* intToString(int value);
+
+template const char* intToString(u32* value);
+
+template const char* floatToString(float value, u8 decimalPlaces);
+template const char* floatToString(double value, u8 decimalPlaces);

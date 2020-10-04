@@ -15,10 +15,7 @@ namespace std::io {
      *
      * @see https://wiki.osdev.org/I/O_Ports#The_list
      */
-    void outb(u16 port, byte val) {
-        // Volatile pour empêcher le compilateur io'optimiser
-        asm volatile ("outb %0, %1" : : "a"(val), "Nd"(port));
-    }
+    void outb(u16 port, byte val);
 
     /**
      * Transfère de la data à travers les ports sur deux octets
@@ -26,9 +23,7 @@ namespace std::io {
      * @param port Port utilisé
      * @param val Valeur à transférer
      */
-    void outw(u16 port, u16 val) {
-        asm volatile ("outw %0, %1" : : "a"(val), "Nd"(port));
-    }
+    void outw(u16 port, u16 val);
 
     /**
      * Récupère de la data à travers les ports
@@ -39,15 +34,7 @@ namespace std::io {
      *
      * @see https://wiki.osdev.org/I/O_Ports#The_list
      */
-    byte inb(u16 port) {
-        byte res;
-
-        asm volatile ("inb %1, %0"
-        : "=a"(res)
-        : "Nd"(port)
-        );
-
-        return res;
-    }
+    byte inb(u16 port);
 }
+
 #endif //ROMAINOS_RAWIO_HPP

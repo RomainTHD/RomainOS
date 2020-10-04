@@ -1,34 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 09/09/2020.
 
-#ifndef ROMAINOS_PRINTTEXT_HPP
-#define ROMAINOS_PRINTTEXT_HPP
-
-#include <types.hpp>
-#include <string.hpp>
-
-#include "rawIO.hpp"
-#include "textColorModes.hpp"
-
-/**
- * Emplacement VRAM
- */
-#define VGA_MEMORY (byte*) 0xb8000
-
-/**
- * Largeur d'une ligne VGA
- */
-#define VGA_WIDTH 80
-
-/**
- * Hauteur d'une colonne
- */
-#define VGA_HEIGHT 25
-
-/**
- * Largeur d'un tab
- */
-#define TAB_LENGTH 4
+#include <io/printText.hpp>
 
 namespace std::io {
     namespace {
@@ -38,11 +11,6 @@ namespace std::io {
         u16 _cursorPosition = 0;
     }
 
-    /**
-     * Set la position du curseur
-     *
-     * @param pos Position
-     */
     void setCursorPosition(u16 pos) {
         pos %= (VGA_WIDTH * VGA_HEIGHT);
 
@@ -54,21 +22,10 @@ namespace std::io {
         _cursorPosition = pos;
     }
 
-    /**
-     * Getter position curseur
-     *
-     * @return Position
-     */
     u16 getCursorPosition() {
         return _cursorPosition;
     }
 
-    /**
-     * Set la position du curseur
-     *
-     * @param row Ligne, -1 = dernière ligne, -2 = avant-dernière, etc
-     * @param col Colonne, -1 = dernière colonne, -2 = avant-dernière, etc
-     */
     void setCursorPosition(i16 row, i16 col) {
         if (row < 0) {
             row = (row + VGA_HEIGHT) % VGA_HEIGHT;
@@ -81,13 +38,7 @@ namespace std::io {
         setCursorPosition(VGA_WIDTH * row + col);
     }
 
-    /**
-     * Affiche un caractère
-     *
-     * @param c Caractère
-     * @param color Couleur
-     */
-    void printChar(char c, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printChar(char c, uint8_t color) {
         switch (c) {
             case '\0':
                 break;
@@ -122,13 +73,7 @@ namespace std::io {
         }
     }
 
-    /**
-     * Affiche une chaine de caractères
-     *
-     * @param str String
-     * @param color Couleur
-     */
-    void printString(_In_ const char *str = "", _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printString(_In_ const char *str, _In_ const char* end, uint8_t color) {
         if (str == nullptr) {
             u16 c = getCursorPosition();
             setCursorPosition(-1, -1);
@@ -153,12 +98,7 @@ namespace std::io {
         }
     }
 
-    /**
-     * Clear l'écran VGA
-     *
-     * @param color Couleur
-     */
-    void clearScreen(uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void clearScreen(uint8_t color) {
         // Fonctionne toujours
         /*
         uint64_t value = 0;
@@ -181,44 +121,24 @@ namespace std::io {
         } while (getCursorPosition() != 0);
     }
 
-    /**
-     * Print int
-     *
-     * @tparam T Type int
-     * @param value Valeur à print
-     * @param end Fin de chaine
-     * @param color Couleur
-     */
     template <typename T>
-    void printInt(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printInt(T value, _In_ const char* end, uint8_t color) {
         printString(intToString(value), end, color);
     }
 
-    /**
-     * Print float
-     *
-     * @tparam T Type float
-     * @param value Valeur à print
-     * @param end Fin de chaine
-     * @param color Couleur
-     */
     template <typename T>
-    void printFloat(T value, _In_ const char* end = "\n", u8 decimalPlaces = 3, uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printFloat(T value, _In_ const char* end, u8 decimalPlaces, uint8_t color) {
         printString(floatToString(value, decimalPlaces), end, color);
     }
 
-    /**
-     * Print int hex
-     *
-     * @tparam T Type int
-     * @param value Valeur à print
-     * @param end Fin de chaine
-     * @param color Couleur
-     */
     template <typename T>
-    void printHex(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT) {
+    void printHex(T value, _In_ const char* end, uint8_t color) {
         printString(hexToString(value), end, color);
     }
-}
 
-#endif //ROMAINOS_PRINTTEXT_HPP
+    template void printInt(int value, _In_ const char* end, uint8_t color);
+    template void printInt(u32 value, _In_ const char* end, uint8_t color);
+    template void printInt(u64 value, _In_ const char* end, uint8_t color);
+
+    template void printHex(u32 value, _In_ const char* end, uint8_t color);
+}

@@ -6,54 +6,12 @@
  */
 // Created by Romain on 14/09/2020.
 
-#ifndef ROMAINOS_IDT_HPP
-#define ROMAINOS_IDT_HPP
+#include <io/IDT.hpp>
 
-#include <types.hpp>
-
-#include "keyboard.hpp"
-
-namespace std::io::idt {
-    /**
-     * Interrupt Descriptor Tables
-     */
-    struct IDT64 {
-        /**
-         * Offset bits 0..15
-         */
-        uint16_t offsetLow;
-
-        /**
-         * Code segment selector, dans GDT ?
-         */
-        uint16_t selector;
-
-        /**
-         * Les bits 0 à 2 contiennent l'offset Interrupt Stack Table, les autres bits sont à 0
-         */
-        uint8_t ist;
-
-        /**
-         * Type et attributs
-         */
-        uint8_t types_attr;
-
-        /**
-         * Offset bits 16..31
-         */
-        uint16_t offsetMid;
-
-        /**
-         * Offset bits 32..63
-         */
-        uint32_t offsetHigh;
-
-        /**
-         * Réservé
-         */
-        uint32_t zero;
-    };
-}
+/**
+ * Routine assembleur keyboard
+ */
+extern u64 _isr1;
 
 /**
  * IDT
@@ -61,16 +19,11 @@ namespace std::io::idt {
 extern std::io::idt::IDT64 _idt[256];
 
 /**
- * Routine assembleur keyboard
+ * Active les IDT
  */
-extern uint64_t _isr1;
+extern "C" void _loadIDT();
 
 namespace std::io::idt {
-    /**
-     * Active les IDT
-     */
-    extern "C" void _loadIDT();
-
     /**
      * Initialise les interruptions
      */
@@ -110,5 +63,3 @@ namespace std::io::idt {
         std::io::handleEvent(b);
     }
 }
-
-#endif //ROMAINOS_IDT_HPP

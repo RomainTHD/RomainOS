@@ -17,84 +17,47 @@ public:
     /**
      * Constructeur
      */
-    Stack() : _first(nullptr), _length(0) {}
+    Stack();
 
     /**
      * Destructeur
      */
-    ~Stack() = default;
+    ~Stack();
 
     /**
      * Ajoute un élément
      *
      * @param elem Élément
      */
-    void push(T elem) {
-        StackElem* newStack = new StackElem(elem);
-
-        if (!empty()) {
-            newStack->next = _first;
-        }
-
-        _first = newStack;
-        _length++;
-    }
+    void push(T elem);
 
     /**
      * Retire un élément
      *
      * @return Élément
      */
-    T pop() {
-        T res;
-
-        if (empty()) {
-            // Erreur
-        }
-        else {
-            res = _first->value;
-            StackElem* oldFirst = _first;
-            _first = _first->next;
-            delete oldFirst;
-            _length--;
-        }
-
-        return res;
-    }
+    T pop();
 
     /**
      * Sommet de stack
      *
      * @return Sommet
      */
-    [[nodiscard]] T peek() const {
-        T res;
-
-        if (empty()) {
-            // Erreur
-        }
-        else {
-            res = _first->value;
-        }
-    }
+    [[nodiscard]] T peek() const;
 
     /**
      * Taille de la pile
      *
      * @return Taille
      */
-    [[nodiscard]] size_t length() const {
-        return _length;
-    }
+    [[nodiscard]] size_t length() const;
 
     /**
      * Vide ou non
      *
      * @return Vide ?
      */
-    [[nodiscard]] bool empty() const {
-        return length() == 0;
-    }
+    [[nodiscard]] bool empty() const;
 
 private:
     /**
@@ -107,12 +70,12 @@ private:
          *
          * @param elem Élément
          */
-        explicit StackElem(T elem) : value(elem), next(nullptr) {}
+        explicit StackElem(T elem);
 
         /**
          * Destructeur
          */
-        ~StackElem() = default;
+        ~StackElem();
 
         /**
          * Élément

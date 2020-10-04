@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 09/09/2020.
 
-#ifndef ROMAINOS_TYPES_HPP
+#ifndef ROMAINOS_TYPES_CPP
 #define ROMAINOS_TYPES_HPP
 
 /**
@@ -61,8 +61,6 @@
  * Valeur de retour double pointeur
  */
 #define _Deref_ret_
-
-static const int NULL = 0;
 
 /**
  * Unsigned int 8 bits. 0 to 255
@@ -155,24 +153,6 @@ typedef uint8_t byte;
 typedef uint32_t size_t;
 
 namespace std::types {
-    namespace {
-        /**
-         * @see isPointer
-         */
-        template<typename T>
-        struct _isPointer {
-            static const bool value = false;
-        };
-
-        /**
-         * @see isPointer
-         */
-        template<typename T>
-        struct _isPointer<T*> {
-            static const bool value = true;
-        };
-    }
-
     /**
      * Si la variable est un pointeur ou non
      *
@@ -181,9 +161,7 @@ namespace std::types {
      * @return Pointeur ou non
      */
     template<typename T>
-    bool isPointer(T) {
-        return _isPointer<T>::value;
-    }
+    bool isPointer(T);
 }
 
-#endif //ROMAINOS_TYPES_HPP
+#endif //ROMAINOS_TYPES_CPP

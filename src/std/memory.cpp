@@ -1,48 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 18/09/2020.
 
-#ifndef ROMAINOS_MEMORY_HPP
-#define ROMAINOS_MEMORY_HPP
-
 #include <types.hpp>
+#include <memory.hpp>
 
 namespace std::memory {
     namespace {
-        /**
-         * Segment RAM (liste chaînée)
-         */
-        struct MemorySegment {
-            /**
-             * Taille
-             */
-            u64 length;
-
-            /**
-             * Segment suivant
-             */
-            MemorySegment* nextSegment;
-
-            /**
-             * Segment précédent
-             */
-            MemorySegment* prevSegment;
-
-            /**
-             * Segment libre suivant
-             */
-            MemorySegment* nextFreeSegment;
-
-            /**
-             * Segment libre précédent
-             */
-            MemorySegment* prevFreeSegment;
-
-            /**
-             * Segment libre ou non
-             */
-            bool isFree;
-        };
-
         /**
          * Combine deux segments libres et évite la fragmentation
          *
@@ -350,5 +313,3 @@ void operator delete[](void* p) noexcept {
 void operator delete[](void* p, size_t size __attribute__((unused))) noexcept {
     std::memory::free(p);
 }
-
-#endif //ROMAINOS_MEMORY_HPP
