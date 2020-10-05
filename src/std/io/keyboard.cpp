@@ -3,7 +3,7 @@
 
 #include <io/keyboard.hpp>
 
-namespace std::io {
+namespace std::io::keyboard {
     /**
      * Namespace anonyme pour garder certaines variables publiques au fichier, privées au projet
      */
@@ -37,6 +37,93 @@ namespace std::io {
          * Est en caps lock ou non
          */
         bool _isCapsLock = false;
+
+        Stack<void (*)(KeyEvent)>* _eventHandlers;
+
+        /**
+         * Keyboard to char
+         *
+         * @param b Byte keyboard
+         *
+         * @return Char associé
+         */
+        KeyEvent _getEvent(byte keyCode) {
+            KeyEvent event {};
+
+            event.key = '\0';
+            event.keyCode = (byte) (keyCode << (byte) 1) >> (byte) 1;
+            event.keyCodeRaw = keyCode;
+            event.pressed = !(keyCode & (byte) 0x80);
+            event.ctrl = _isCtrl;
+            event.alt = _isAlt;
+            event.shift = _isShift;
+
+            switch (_keyboardLayoutType) {
+                case AZERTY:
+                default:
+                    event.key = _keyboardLayout.layout[keyCode];
+                    break;
+            }
+
+            if (event.keyCode == _keyboardLayout.VK_SHIFT) {
+                _isShift = !_isShift;
+            }
+            else if (event.keyCode == _keyboardLayout.VK_ALT) {
+                _isAlt = !_isAlt;
+            }
+            else if (event.keyCode == _keyboardLayout.VK_CAPS_LOCK) {
+                if (event.pressed) {
+                    _isCapsLock = !_isCapsLock;
+                }
+            }
+            else if (event.keyCode == _keyboardLayout.VK_CTRL) {
+                _isCtrl = !_isCtrl;
+            }
+
+            if (event.shift xor _isCapsLock) {
+                if (event.key >= 'a' && event.key <= 'z') {
+                    event.key += ('A' - 'a');
+                }
+            }
+
+            return event;
+        }
+    }
+
+    void _notifyEvent(byte b) {
+        if (_eventHandlers == nullptr) {
+            return;
+        }
+
+        KeyEvent event = _getEvent(b);
+        Stack<void (*)(KeyEvent)> tmp;
+        void (*f)(KeyEvent);
+
+        while (!_eventHandlers->empty()) {
+            f = _eventHandlers->pop();
+            tmp.push(f);
+            f(event);
+        }
+
+        while (!tmp.empty()) {
+            _eventHandlers->push(tmp.pop());
+        }
+
+        if (event.keyCode == _keyboardLayout.VK_ESC) {
+            std::system::shutdownAndPrint();
+        }
+    }
+
+    void addEventHandler(void (*f)(KeyEvent)) {
+        if (_eventHandlers == nullptr) {
+            _eventHandlers = new Stack<void (*)(KeyEvent)>();
+        }
+
+        _eventHandlers->push(f);
+    }
+
+    void deleteEventHandler(void (*f)(KeyEvent)) {
+        // TODO: Passer sur linked list
     }
 
     /**
@@ -51,69 +138,5 @@ namespace std::io {
         _isAlt = false;
         _isShift = false;
         _isCapsLock = false;
-    }
-
-    /**
-     * Keyboard to char
-     *
-     * @param b Byte keyboard
-     *
-     * @return Char associé
-     */
-    KeyEvent getEvent(byte keyCode) {
-        KeyEvent event {};
-
-        event.key = '\0';
-        event.keyCode = (byte) (keyCode << (byte) 1) >> (byte) 1;
-        event.keyCodeRaw = keyCode;
-        event.pressed = !(keyCode & (byte) 0x80);
-        event.ctrl = _isCtrl;
-        event.alt = _isAlt;
-        event.shift = _isShift;
-
-        switch (_keyboardLayoutType) {
-            case AZERTY:
-            default:
-                event.key = _keyboardLayout.layout[keyCode];
-                break;
-        }
-
-        if (event.keyCode == _keyboardLayout.VK_SHIFT) {
-            _isShift = !_isShift;
-        }
-        else if (event.keyCode == _keyboardLayout.VK_ALT) {
-            _isAlt = !_isAlt;
-        }
-        else if (event.keyCode == _keyboardLayout.VK_CAPS_LOCK) {
-            if (event.pressed) {
-                _isCapsLock = !_isCapsLock;
-            }
-        }
-        else if (event.keyCode == _keyboardLayout.VK_CTRL) {
-            _isCtrl = !_isCtrl;
-        }
-
-        if (event.shift xor _isCapsLock) {
-            if (event.key >= 'a' && event.key <= 'z') {
-                event.key += ('A' - 'a');
-            }
-        }
-
-        return event;
-    }
-
-    /**
-     * Gère un évènement
-     *
-     * @param b Code
-     */
-    void handleEvent(byte b) {
-        KeyEvent event = getEvent(b);
-
-        std::io::printChar(event.key);
-
-        if (event.keyCode == _keyboardLayout.VK_ESC) {
-            std::system::shutdownAndPrint();
-        }
     }
 }

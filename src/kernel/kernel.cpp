@@ -6,6 +6,8 @@
 #include <io/IO.hpp>
 #include <memory.hpp>
 
+extern int main();
+
 /**
  * Point d'entrée de l'OS
  */
@@ -13,8 +15,7 @@ extern "C" void _start() {
     std::io::clearScreen();
     std::io::setCursorPosition(0, 0);
     std::io::idt::initIDT();
-    std::io::setKeyboardLayout(std::io::AZERTY);
     std::memory::initHeap(0x100000, 0x100000);
 
-    std::io::printString("Tout fonctionne !", "\n", BG_RED | FG_WHITE);
+    main();
 }

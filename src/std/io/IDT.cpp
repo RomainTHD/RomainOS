@@ -60,6 +60,6 @@ namespace std::io::idt {
         outb(0x20, 0x20);
         outb(0xa0, 0x20);
 
-        std::io::handleEvent(b);
+        std::io::keyboard::_notifyEvent(b);
     }
 }

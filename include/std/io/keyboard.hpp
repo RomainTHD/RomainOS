@@ -8,7 +8,7 @@
 
 #include "keyboardLayout.hpp"
 
-namespace std::io {
+namespace std::io::keyboard {
     /**
      * Event clavier
      */
@@ -50,27 +50,32 @@ namespace std::io {
     };
 
     /**
+     * Gère un évènement
+     *
+     * @param b Code
+     */
+    void _notifyEvent(byte b);
+
+    /**
+     * Ajoute une fonction en handler
+     *
+     * @param f Fonction
+     */
+    void addEventHandler(void (*f)(KeyEvent));
+
+    /**
+     * Supprime une fonction en handler
+     *
+     * @param f Fonction
+     */
+    void deleteEventHandler(void (*f)(KeyEvent));
+
+    /**
      * Set la disposition clavier
      *
      * @param layout Layout
      */
     void setKeyboardLayout(KeyboardLayoutType layout);
-
-    /**
-     * Keyboard to char
-     *
-     * @param b Byte keyboard
-     *
-     * @return Char associé
-     */
-    KeyEvent getEvent(byte keyCode);
-
-    /**
-     * Gère un évènement
-     *
-     * @param b Code
-     */
-    void handleEvent(byte b);
 }
 
 #endif //ROMAINOS_KEYBOARD_HPP
