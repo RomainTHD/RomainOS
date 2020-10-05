@@ -110,4 +110,6 @@ namespace std::io {
     void printHex(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT);
 }
 
+#include "printText.tpp"
+
 #endif //ROMAINOS_PRINTTEXT_HPP

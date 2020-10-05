@@ -99,4 +99,6 @@ private:
     size_t _length;
 };
 
+#include "stack.tpp"
+
 #endif //ROMAINOS_STACK_HPP

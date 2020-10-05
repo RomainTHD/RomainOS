@@ -1,7 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Created by Romain on 11/09/2020.
+// Created by Romain on 05/10/2020.
 
-#include <stack.hpp>
+#ifndef ROMAINOS_STACK_TPP
+#define ROMAINOS_STACK_TPP
 
 template<typename T>
 Stack<T>::Stack() : _first(nullptr), _length(0) {}
@@ -68,3 +69,5 @@ Stack<T>::StackElem::StackElem(T elem) : value(elem), next(nullptr) {}
 
 template<typename T>
 Stack<T>::StackElem::~StackElem() = default;
+
+#endif //ROMAINOS_STACK_TPP

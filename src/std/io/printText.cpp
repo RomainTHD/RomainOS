@@ -120,25 +120,4 @@ namespace std::io {
             printChar(' ', color);
         } while (getCursorPosition() != 0);
     }
-
-    template <typename T>
-    void printInt(T value, _In_ const char* end, uint8_t color) {
-        printString(intToString(value), end, color);
-    }
-
-    template <typename T>
-    void printFloat(T value, _In_ const char* end, u8 decimalPlaces, uint8_t color) {
-        printString(floatToString(value, decimalPlaces), end, color);
-    }
-
-    template <typename T>
-    void printHex(T value, _In_ const char* end, uint8_t color) {
-        printString(hexToString(value), end, color);
-    }
-
-    template void printInt(int value, _In_ const char* end, uint8_t color);
-    template void printInt(u32 value, _In_ const char* end, uint8_t color);
-    template void printInt(u64 value, _In_ const char* end, uint8_t color);
-
-    template void printHex(u32 value, _In_ const char* end, uint8_t color);
 }
