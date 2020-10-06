@@ -113,4 +113,6 @@ const char* intToString(T* value);
 template <typename T>
 const char* floatToString(T value, u8 decimalPlaces = 3);
 
+#include "../../src/std/string.tpp"
+
 #endif //ROMAINOS_STRING_HPP
