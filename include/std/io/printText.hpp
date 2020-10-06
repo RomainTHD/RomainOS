@@ -10,27 +10,22 @@
 #include "rawIO.hpp"
 #include "textColorModes.hpp"
 
-/**
- * Emplacement VRAM
- */
-#define VGA_MEMORY (byte*) 0xb8000
-
-/**
- * Largeur d'une ligne VGA
- */
-#define VGA_WIDTH 80
-
-/**
- * Hauteur d'une colonne
- */
-#define VGA_HEIGHT 25
-
-/**
- * Largeur d'un tab
- */
-#define TAB_LENGTH 4
-
 namespace std::io {
+    /**
+     * Largeur d'une ligne VGA
+     */
+    const u8 VGA_WIDTH = 80;
+
+    /**
+     * Hauteur d'une colonne
+     */
+    const u8 VGA_HEIGHT = 25;
+
+    /**
+     * Largeur d'un tab
+     */
+    const u8 TAB_LENGTH = 4;
+
     /**
      * Set la position du curseur
      *
@@ -110,6 +105,6 @@ namespace std::io {
     void printHex(T value, _In_ const char* end = "\n", uint8_t color = BG_DEFAULT | FG_DEFAULT);
 }
 
-#include "printText.tpp"
+#include "../../../src/std/io/printText.tpp"
 
 #endif //ROMAINOS_PRINTTEXT_HPP

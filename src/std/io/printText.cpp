@@ -6,6 +6,11 @@
 namespace std::io {
     namespace {
         /**
+         * Emplacement VRAM
+         */
+        byte* VGA_MEMORY = (byte*) 0xb8000;
+
+        /**
          * Position du curseur
          */
         u16 _cursorPosition = 0;
@@ -51,6 +56,7 @@ namespace std::io {
                 break;
 
             case '\t': {
+                // Accolades pour utiliser une variable dans un case
                 u8 i = 0;
                 do {
                     printChar(' ');

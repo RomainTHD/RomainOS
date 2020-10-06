@@ -5,10 +5,10 @@
 
 int main() {
     std::io::keyboard::setKeyboardLayout(std::io::keyboard::AZERTY);
-    std::io::keyboard::addEventHandler([](std::io::keyboard::KeyEvent e){
+    std::io::keyboard::addEventHandler([](std::io::keyboard::KeyEvent e) {
         std::io::printChar(e.key);
     });
 
-    std::io::printString("Tout fonctionne !", "\n", BG_RED | FG_WHITE);
+    std::io::printString("Tout fonctionne !", "\n", std::io::BG_RED | std::io::FG_WHITE);
     return 0;
 }
