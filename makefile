@@ -7,20 +7,21 @@ SRCDIR := ./src
 OBJDIR := ./obj
 DEPDIR := dep
 SRCS   := $(shell find $(SRCDIR) -name "*.cpp")
-OBJS     := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
-DEPS     := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
-TREE     := $(patsubst %/,%,$(dir $(OBJS)))
+OBJS   := $(SRCS:$(SRCDIR)/%.cpp=$(OBJDIR)/%.o)
+DEPS   := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
+TREE   := $(patsubst %/,%,$(dir $(OBJS)))
 
-CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./include -I ./include/std
+CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -fno-exceptions -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./include -I ./include/std
 # -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
 # -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
 # -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
+# -fno-exceptions           Désactive la génération de code pour les exceptions (vu qu'elles n'existent pas)
 # -m64                      Génère du code pour 64 bits
 # -save-temps=obj           Exporte les .cpp en assembleur dans le même dossier que les .o
 # -Wall                     Toutes les erreurs
 # -Wextra                   Extra erreurs
 # -pedantic                 Erreurs en plus
-# -Wno-write-strings        Disable le warning pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
+# -Wno-write-strings        Disable les warnings pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
 # -std=c++1z                C++ 17
 # -I ./src                  Dossier d'include pour les .hpp
 # -I ./src/std              Dossier d'include pour les .hpp : std
