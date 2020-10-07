@@ -34,6 +34,16 @@ namespace std::io {
     void setCursorPosition(u16 pos);
 
     /**
+     * @return Ligne curseur
+     */
+    u16 getCursorPositionRow();
+
+    /**
+     * @return Colonne curseur
+     */
+    u16 getCursorPositionCol();
+
+    /**
      * Getter position curseur
      *
      * @return Position
@@ -47,6 +57,14 @@ namespace std::io {
      * @param col Colonne, -1 = dernière colonne, -2 = avant-dernière, etc
      */
     void setCursorPosition(i16 row, i16 col);
+
+    /**
+     * Récupère un caractère à une position donnée
+     *
+     * @param pos Position
+     * @return Caractère
+     */
+    char getChar(u16 pos);
 
     /**
      * Affiche un caractère

@@ -31,6 +31,14 @@ namespace std::io {
         return _cursorPosition;
     }
 
+    u16 getCursorPositionRow() {
+        return getCursorPosition() / VGA_WIDTH;
+    }
+
+    u16 getCursorPositionCol() {
+        return getCursorPosition() % VGA_WIDTH;
+    }
+
     void setCursorPosition(i16 row, i16 col) {
         if (row < 0) {
             row = (row + VGA_HEIGHT) % VGA_HEIGHT;
@@ -41,6 +49,10 @@ namespace std::io {
         }
 
         setCursorPosition(VGA_WIDTH * row + col);
+    }
+
+    char getChar(u16 pos) {
+        return *(VGA_MEMORY + pos*2);
     }
 
     void printChar(char c, uint8_t color) {
@@ -65,8 +77,36 @@ namespace std::io {
             }
                 break;
 
-            case 0x7f:
+            case 0x7f: {
                 // DEL
+                if (getCursorPosition() == 0) {
+                    break;
+                }
+
+                u16 row = getCursorPositionRow();
+
+                if (getCursorPositionCol() == 0) {
+                    do {
+                        setCursorPosition(getCursorPosition()-1);
+                    }
+                    while (getChar(getCursorPosition()) == ' ' && getCursorPositionCol() > 0);
+                }
+                else {
+                    setCursorPosition(getCursorPosition()-1);
+                    printChar(' ');
+                    setCursorPosition(getCursorPosition()-1);
+                }
+
+                if (getCursorPositionRow() == row) {
+                    printChar(' ');
+                    setCursorPosition(getCursorPosition()-1);
+                }
+                else {
+                    if (getCursorPositionCol() != 0) {
+                        setCursorPosition(getCursorPosition()+1);
+                    }
+                }
+            }
                 break;
 
             default:
