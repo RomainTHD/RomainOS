@@ -4,7 +4,14 @@
 #ifndef ROMAINOS_KEYBOARDLAYOUT_HPP
 #define ROMAINOS_KEYBOARDLAYOUT_HPP
 
-namespace std::io {
+namespace std::io::keyboard {
+    extern char VK_ESC;
+    extern char VK_DEL;
+    extern char VK_SHIFT;
+    extern char VK_ALT;
+    extern char VK_CTRL;
+    extern char VK_CAPS_LOCK;
+
     struct KeyboardLayout {
         char layout[256];
         char VK_ESC;
@@ -19,6 +26,8 @@ namespace std::io {
         AZERTY = 0,
         QWERTY = 1
     } KeyboardLayoutType;
+
+    void setLayoutSpecialChars(KeyboardLayoutType type);
 
     extern KeyboardLayout layouts[2];
 }

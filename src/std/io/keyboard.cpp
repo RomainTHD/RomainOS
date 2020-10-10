@@ -38,7 +38,10 @@ namespace std::io::keyboard {
          */
         bool _isCapsLock = false;
 
-        Stack<void (*)(KeyEvent)>* _eventHandlers;
+        /**
+         * Event handlers
+         */
+        Stack<void (*)(KeyEvent)> _eventHandlers;
 
         /**
          * Keyboard to char
@@ -65,18 +68,18 @@ namespace std::io::keyboard {
                     break;
             }
 
-            if (event.keyCode == _keyboardLayout.VK_SHIFT) {
+            if (event.keyCode == VK_SHIFT) {
                 _isShift = !_isShift;
             }
-            else if (event.keyCode == _keyboardLayout.VK_ALT) {
+            else if (event.keyCode == VK_ALT) {
                 _isAlt = !_isAlt;
             }
-            else if (event.keyCode == _keyboardLayout.VK_CAPS_LOCK) {
+            else if (event.keyCode == VK_CAPS_LOCK) {
                 if (event.pressed) {
                     _isCapsLock = !_isCapsLock;
                 }
             }
-            else if (event.keyCode == _keyboardLayout.VK_CTRL) {
+            else if (event.keyCode == VK_CTRL) {
                 _isCtrl = !_isCtrl;
             }
 
@@ -91,39 +94,40 @@ namespace std::io::keyboard {
     }
 
     void _notifyEvent(byte b) {
-        if (_eventHandlers == nullptr) {
-            return;
-        }
-
         KeyEvent event = _getEvent(b);
         Stack<void (*)(KeyEvent)> tmp;
         void (*f)(KeyEvent);
 
-        while (!_eventHandlers->empty()) {
-            f = _eventHandlers->pop();
+        while (!_eventHandlers.empty()) {
+            f = _eventHandlers.pop();
             tmp.push(f);
             f(event);
         }
 
         while (!tmp.empty()) {
-            _eventHandlers->push(tmp.pop());
-        }
-
-        if (event.keyCode == _keyboardLayout.VK_ESC) {
-            std::system::shutdownAndPrint();
+            _eventHandlers.push(tmp.pop());
         }
     }
 
     void addEventHandler(void (*f)(KeyEvent)) {
-        if (_eventHandlers == nullptr) {
-            _eventHandlers = new Stack<void (*)(KeyEvent)>();
-        }
-
-        _eventHandlers->push(f);
+        _eventHandlers.push(f);
     }
 
     void deleteEventHandler(void (*f)(KeyEvent)) {
-        // TODO: Passer sur linked list
+        Stack<void (*)(KeyEvent)> tmp;
+        void (*f_tmp)(KeyEvent);
+
+        while (!_eventHandlers.empty()) {
+            f_tmp = _eventHandlers.pop();
+
+            if (f != f_tmp) {
+                tmp.push(f_tmp);
+            }
+        }
+
+        while (!tmp.empty()) {
+            _eventHandlers.push(tmp.pop());
+        }
     }
 
     /**
@@ -132,11 +136,13 @@ namespace std::io::keyboard {
      * @param layout Layout
      */
     void setKeyboardLayout(KeyboardLayoutType layout) {
-        _keyboardLayout = layouts[layout];
         _keyboardLayoutType = layout;
         _isCtrl = false;
         _isAlt = false;
         _isShift = false;
         _isCapsLock = false;
+
+        setLayoutSpecialChars(layout);
+        _keyboardLayout = layouts[layout];
     }
 }

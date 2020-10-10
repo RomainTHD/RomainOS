@@ -31,7 +31,7 @@
 #define _layoutQWERTY {\
 }
 
-namespace std::io {
+namespace std::io::keyboard {
     KeyboardLayout layouts[2] = {
         {
             _layoutAZERTY,
@@ -52,6 +52,24 @@ namespace std::io {
             0x00
         },
     };
+
+    char VK_ESC;
+    char VK_DEL;
+    char VK_SHIFT;
+    char VK_ALT;
+    char VK_CTRL;
+    char VK_CAPS_LOCK;
+
+    void setLayoutSpecialChars(KeyboardLayoutType type) {
+        KeyboardLayout layout = layouts[type];
+
+        std::io::keyboard::VK_ESC = layout.VK_ESC;
+        std::io::keyboard::VK_DEL = layout.VK_DEL;
+        std::io::keyboard::VK_SHIFT = layout.VK_SHIFT;
+        std::io::keyboard::VK_ALT = layout.VK_ALT;
+        std::io::keyboard::VK_CTRL = layout.VK_CTRL;
+        std::io::keyboard::VK_CAPS_LOCK = layout.VK_CAPS_LOCK;
+    }
 }
 
 #undef _layoutAZERTY

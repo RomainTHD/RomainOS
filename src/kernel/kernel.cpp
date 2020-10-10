@@ -17,5 +17,11 @@ extern "C" void _start() {
     std::io::idt::initIDT();
     std::memory::initHeap(0x100000, 0x100000);
 
+    std::io::keyboard::addEventHandler([](std::io::keyboard::KeyEvent e) {
+        if (e.keyCode == std::io::keyboard::VK_ESC) {
+            std::system::shutdownAndPrint();
+        }
+    });
+
     main();
 }
