@@ -10,7 +10,7 @@ namespace std::memory {
     /**
      * Segment RAM (liste chaînée)
      */
-    struct MemorySegment {
+    struct MemorySegmentHeader {
         /**
          * Taille
          */
@@ -19,22 +19,22 @@ namespace std::memory {
         /**
          * Segment suivant
          */
-        MemorySegment* nextSegment;
+        MemorySegmentHeader* nextSegment;
 
         /**
          * Segment précédent
          */
-        MemorySegment* prevSegment;
+        MemorySegmentHeader* prevSegment;
 
         /**
          * Segment libre suivant
          */
-        MemorySegment* nextFreeSegment;
+        MemorySegmentHeader* nextFreeSegment;
 
         /**
          * Segment libre précédent
          */
-        MemorySegment* prevFreeSegment;
+        MemorySegmentHeader* prevFreeSegment;
 
         /**
          * Segment libre ou non
@@ -53,7 +53,7 @@ namespace std::memory {
     /**
      * Alloue de la mémoire.
      * On est honnêtement pas sur la meilleure implémentation qui existe,
-     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegment qu'on
+     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegmentHeader qu'on
      * doit bien stocker quelque part, mais ça fait le taf c'est ce qui compte.
      *
      * @param size Taille

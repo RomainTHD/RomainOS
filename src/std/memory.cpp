@@ -12,7 +12,7 @@ namespace std::memory {
          * @param segA Segment A
          * @param segB Segment B
          */
-        void combineFreeSegments(_Inout_ MemorySegment* segA, _Inout_ MemorySegment* segB) {
+        void combineFreeSegments(_Inout_ MemorySegmentHeader* segA, _Inout_ MemorySegmentHeader* segB) {
             if (segA == nullptr) {
                 return;
             }
@@ -22,7 +22,7 @@ namespace std::memory {
             }
 
             if (segA < segB) {
-                segA->length += segB->length + sizeof(MemorySegment);
+                segA->length += segB->length + sizeof(MemorySegmentHeader);
                 segA->nextSegment = segB->nextSegment;
                 segA->nextFreeSegment = segB->nextFreeSegment;
 
@@ -31,7 +31,7 @@ namespace std::memory {
                 segB->nextFreeSegment->prevFreeSegment = segA;
             }
             else {
-                segB->length += segA->length + sizeof(MemorySegment);
+                segB->length += segA->length + sizeof(MemorySegmentHeader);
                 segB->nextSegment = segA->nextSegment;
                 segB->nextFreeSegment = segA->nextFreeSegment;
 
@@ -44,7 +44,7 @@ namespace std::memory {
         /**
          * 1er segment
          */
-        MemorySegment* _firstFreeSegment;
+        MemorySegmentHeader* _firstFreeSegment;
     }
 
     /**
@@ -54,8 +54,8 @@ namespace std::memory {
      * @param heapLength Taille du segment
      */
     void initHeap(u64 heapAddress, u64 heapLength) {
-        _firstFreeSegment = (MemorySegment*) heapAddress;
-        _firstFreeSegment->length = heapLength - sizeof(MemorySegment);
+        _firstFreeSegment = (MemorySegmentHeader*) heapAddress;
+        _firstFreeSegment->length = heapLength - sizeof(MemorySegmentHeader);
         _firstFreeSegment->nextSegment = nullptr;
         _firstFreeSegment->prevSegment = nullptr;
         _firstFreeSegment->nextFreeSegment = nullptr;
@@ -66,7 +66,7 @@ namespace std::memory {
     /**
      * Alloue de la mémoire.
      * On est honnêtement pas sur la meilleure implémentation qui existe,
-     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegment qu'on
+     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegmentHeader qu'on
      * doit bien stocker quelque part, mais ça fait le taf c'est ce qui compte.
      *
      * @param size Taille
@@ -83,18 +83,18 @@ namespace std::memory {
             size += 8;
         }
 
-        std::memory::MemorySegment* currentMemorySegment = std::memory::_firstFreeSegment;
+        std::memory::MemorySegmentHeader* currentMemorySegment = std::memory::_firstFreeSegment;
 
         while (true) {
             if (currentMemorySegment->length >= size) {
                 // On a trouvé un segment libre
 
-                if (currentMemorySegment->length != size) {
+                if (currentMemorySegment->length > size + sizeof(MemorySegmentHeader)) {
                     // On va split le segment pour n'allouer que ce qu'il faut
 
-                    MemorySegment* newSegment = (MemorySegment*) ((u64) currentMemorySegment + sizeof(MemorySegment) + size);
+                    MemorySegmentHeader* newSegment = (MemorySegmentHeader*) ((u64) currentMemorySegment + sizeof(MemorySegmentHeader) + size);
                     newSegment->isFree = true;
-                    newSegment->length = (u64) currentMemorySegment->length - (sizeof(MemorySegment) + size);
+                    newSegment->length = (u64) currentMemorySegment->length - (sizeof(MemorySegmentHeader) + size);
                     newSegment->nextSegment = currentMemorySegment->nextSegment;
                     newSegment->nextFreeSegment = currentMemorySegment->nextFreeSegment;
                     newSegment->prevSegment = currentMemorySegment;
@@ -102,6 +102,7 @@ namespace std::memory {
 
                     currentMemorySegment->nextFreeSegment = newSegment;
                     currentMemorySegment->nextSegment = newSegment;
+                    currentMemorySegment->length = size;
                 }
 
                 if (currentMemorySegment == _firstFreeSegment) {
@@ -110,7 +111,6 @@ namespace std::memory {
                 }
 
                 currentMemorySegment->isFree = false;
-                currentMemorySegment->length = size;
 
                 if (currentMemorySegment->prevFreeSegment != nullptr) {
                     // Changement des segments libres de la liste chainée
@@ -204,7 +204,7 @@ namespace std::memory {
      * @param ptr Pointeur
      */
     void free(_Out_ void* ptr) {
-        MemorySegment* currentMemorySegment = ((MemorySegment*) ptr) - 1;
+        MemorySegmentHeader* currentMemorySegment = ((MemorySegmentHeader*) ptr) - 1;
         currentMemorySegment->isFree = true;
 
         if (currentMemorySegment < _firstFreeSegment) {
