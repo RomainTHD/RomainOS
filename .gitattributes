@@ -14,7 +14,8 @@
 *.c               text diff=c linguist-language=c
 *.cpp             text diff=cpp linguist-language=c++
 *.hpp             text diff=cpp linguist-language=c++
-*.h               text diff=c linguist-language=c
+*.h               text diff=cpp linguist-language=c++
+libc/include/*    text diff=cpp linguist-language=c++
 
 # Documentation
 *.md              text

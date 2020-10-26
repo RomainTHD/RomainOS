@@ -5,7 +5,21 @@ ENTRY(_start)
 INPUT (
     ./obj/binaries.o
     ./obj/extendedProgram.o
+    ./obj/kernel/icxxabi.o
+    ./obj/kernel/IDT.o
     ./obj/kernel/kernel.o
+    ./obj/kernel/system.o
+    ./obj/libc/random.o
+    ./obj/libc/time.o
+    ./obj/libc/stddef/types.o
+    ./obj/libc/stdio/keyboard.o
+    ./obj/libc/stdio/keyboardLayout.o
+    ./obj/libc/stdio/printText.o
+    ./obj/libc/stdio/rawIO.o
+    ./obj/libc/stdlib/memory.o
+    ./obj/libc/stdlib/memoryMap.o
+    ./obj/libc/string/string.o
+    ./obj/programs/textEditor/textEditor.o
 )
 
 OUTPUT (

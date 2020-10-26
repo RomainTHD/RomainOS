@@ -14,10 +14,6 @@ f = open("./scripts/linker.ld", 'r')
 linkerStr = f.read()
 f.close()
 
-f = open("./scripts/linker.ld.bak", 'w')
-f.write(linkerStr)
-f.close()
-
 linkerArr = []
 
 split_1 = linkerStr.split(sep="INPUT")
