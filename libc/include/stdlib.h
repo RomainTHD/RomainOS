@@ -4,7 +4,7 @@
 #ifndef ROMAINOS_STDLIB_H
 #define ROMAINOS_STDLIB_H
 
-#include "../stdlib/memory.hpp"
+#include "memory.h"
 #include "../stdlib/memoryMap.hpp"
 #include "random.h"
 #include "time.h"

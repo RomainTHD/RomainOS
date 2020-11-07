@@ -2,7 +2,7 @@
 // Created by Romain on 18/09/2020.
 
 #include <cstdint>
-#include "memory.hpp"
+#include "memory.h"
 
 namespace stdlib {
     namespace {
@@ -47,12 +47,6 @@ namespace stdlib {
         MemorySegmentHeader* _firstFreeSegment;
     }
 
-    /**
-     * Initialise la RAM en allouant un segment XXL qui sera ensuite découpé plus tard
-     *
-     * @param heapAddress Adresse du segment
-     * @param heapLength Taille du segment
-     */
     void initHeap(u64 heapAddress, u64 heapLength) {
         _firstFreeSegment = (MemorySegmentHeader*) heapAddress;
         _firstFreeSegment->length = heapLength - sizeof(MemorySegmentHeader);
@@ -63,17 +57,7 @@ namespace stdlib {
         _firstFreeSegment->isFree = true;
     }
 
-    /**
-     * Alloue de la mémoire.
-     * On est honnêtement pas sur la meilleure implémentation qui existe,
-     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegmentHeader qu'on
-     * doit bien stocker quelque part, mais ça fait le taf c'est ce qui compte.
-     *
-     * @param size Taille
-     *
-     * @return Pointeur
-     */
-    void* malloc(u64 size) {
+    void* malloc(size_t size) {
         // Alignement de la RAM, utile pour meilleures performances sur hardware 64 bits
 
         u64 remainder = size % 8;
@@ -142,67 +126,14 @@ namespace stdlib {
         }
     }
 
-    /**
-     * Set un tableau et le modifie
-     *
-     * @tparam T Type d'une case
-     * @param ptr Pointeur
-     * @param value Valeur
-     * @param nb Nombre de cases à set
-     *
-     * @return Tableau
-     */
-    template<typename T>
-    T* memset(_Out_ void* ptr, T value, u64 nb) {
-        for (u64 i=0; i<nb; i++) {
-            ((T*) ptr)[i] = value;
-        }
-        return (T*) ptr;
-    }
-
-    /**
-     * Set un tableau et le modifie
-     *
-     * @param ptr Pointeur
-     * @param value Valeur
-     * @param nb Nombre de cases à set
-     *
-     * @return Tableau
-     */
-    void* memset(_Out_ void* ptr, int value, u64 nb) {
+    void* memset(_Out_ void* ptr, int value, size_t nb) {
         return memset<byte>(ptr, value, nb);
     }
 
-    /**
-     * Mémoire initialisée à 0
-     *
-     * @param nb Nombre d'objets
-     * @param size Taille d'un objet
-     *
-     * @return Pointeur
-     */
     void* calloc(size_t nb, size_t size) {
         return memset(malloc(nb*size), 0, nb);
     }
 
-    /**
-     * Tableau initialisé à 0
-     *
-     * @tparam T Type
-     * @param nb Nombre de cases
-     *
-     * @return Pointeur
-     */
-    template<typename T>
-    T* calloc(size_t nb) {
-        return memset<T>(malloc(nb*sizeof(T)), 0, nb);
-    }
-
-    /**
-     * Libère de la mémoire
-     *
-     * @param ptr Pointeur
-     */
     void free(_Out_ void* ptr) {
         MemorySegmentHeader* currentMemorySegment = ((MemorySegmentHeader*) ptr) - 1;
         currentMemorySegment->isFree = true;
@@ -240,76 +171,36 @@ namespace stdlib {
         }
     }
 
-    /**
-     * Réalloue de la mémoire
-     *
-     * @param ptr Pointeur
-     * @param size Nouvelle taille
-     *
-     * @return Nouveau pointeur
-     */
-    void* realloc(void* ptr, size_t size) {
+    void* realloc(_Inout_ void* ptr, size_t size) {
         free(ptr);
         return malloc(size);
     }
+
+    void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length) {
+        return memcpy<byte>(dest, src, length);
+    }
 }
 
-/**
- * Opérateur new
- *
- * @param size Taille
- *
- * @return Pointeur objet
- */
 void* operator new(size_t size) {
     return stdlib::malloc(size);
 }
 
-/**
- * Opérateur new[]
- *
- * @param size Taille
- *
- * @return Pointeur array
- */
 void* operator new[](size_t size) {
     return stdlib::malloc(size);
 }
 
-/**
- * Opérateur delete
- *
- * @param p Pointeur
- */
 void operator delete(void* p) noexcept {
     stdlib::free(p);
 }
 
-/**
- * Opérateur delete
- *
- * @param p Pointeur
- * @param size Taille
- */
 void operator delete(void* p, size_t size __attribute__((unused))) noexcept {
     stdlib::free(p);
 }
 
-/**
- * Opérateur delete[]
- *
- * @param p Pointeur
- */
 void operator delete[](void* p) noexcept {
     stdlib::free(p);
 }
 
-/**
- * Opérateur delete[]
- *
- * @param p Pointeur
- * @param size Taille
- */
 void operator delete[](void* p, size_t size __attribute__((unused))) noexcept {
     stdlib::free(p);
 }

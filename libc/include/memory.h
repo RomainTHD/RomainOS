@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 18/09/2020.
 
-#ifndef ROMAINOS_MEMORY_HPP
-#define ROMAINOS_MEMORY_HPP
+#ifndef ROMAINOS_MEMORY_H
+#define ROMAINOS_MEMORY_H
 
 #include <cstdint>
 
@@ -60,7 +60,7 @@ namespace stdlib {
      *
      * @return Pointeur
      */
-    void* malloc(u64 size);
+    void* malloc(size_t size);
 
     /**
      * Set un tableau et le modifie
@@ -73,7 +73,7 @@ namespace stdlib {
      * @return Tableau
      */
     template<typename T>
-    T* memset(_Out_ void* ptr, T value, u64 nb);
+    T* memset(_Out_ void* ptr, T value, size_t nb);
 
     /**
      * Set un tableau et le modifie
@@ -84,7 +84,7 @@ namespace stdlib {
      *
      * @return Tableau
      */
-    void* memset(_Out_ void* ptr, int value, u64 nb);
+    void* memset(_Out_ void* ptr, int value, size_t nb);
 
     /**
      * Mémoire initialisée à 0
@@ -123,7 +123,30 @@ namespace stdlib {
      * @return Nouveau pointeur
      */
     void* realloc(_Inout_ void* ptr, size_t size);
+
+    /**
+     * Copie deux emplacements mémoire
+     *
+     * @param dest Destination
+     * @param src Source
+     * @param length Nombre d'octets
+     */
+    void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length);
+
+    /**
+     * Copie deux emplacements mémoire
+     *
+     * @tparam T Type d'élément
+     * @param dest Destination
+     * @param src Source
+     * @param length Nombre d'éléments
+     */
+    template <typename T>
+    void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length);
 }
+
+constexpr auto malloc = stdlib::malloc;
+constexpr auto free = stdlib::free;
 
 /**
  * Opérateur new
@@ -173,4 +196,6 @@ void operator delete[](void* p) noexcept;
  */
 void operator delete[](void* p, size_t size __attribute__((unused))) noexcept;
 
-#endif //ROMAINOS_MEMORY_HPP
+#include "../stdlib/memory.tpp"
+
+#endif //ROMAINOS_MEMORY_H
