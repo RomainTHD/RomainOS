@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Created by Romain on 06/10/2020.
 
-#ifndef ROMAINOS_STRING_TPP
-#define ROMAINOS_STRING_TPP
+#ifndef ROMAINOS_STRINGROMAINOS_TPP
+#define ROMAINOS_STRINGROMAINOS_TPP
 
 #include <cstdint>
 
@@ -47,11 +47,11 @@ const char* intToString(T value) {
 
     while (sizeTester / 10 > 0) {
         sizeTester /= 10;
-        size++;
+        ++size;
     }
 
     if (isNegative) {
-        size++;
+        ++size;
     }
 
     u64 newValue = (u64) value;
@@ -59,12 +59,12 @@ const char* intToString(T value) {
         u8 remainder = newValue % 10;
         newValue /= 10;
         integerToStringOutput[size - index] = (char) (remainder + '0');
-        index++;
+        ++index;
     }
 
     u8 remainder = newValue % 10;
     integerToStringOutput[size - index] = (char) (remainder + '0');
-    index++;
+    ++index;
 
     if (isNegative == 1) {
         integerToStringOutput[size - index] = '-';
@@ -92,19 +92,19 @@ const char* floatToString(T value, u8 decimalPlaces) {
     while (*intPtr != '\0') {
         *floatPtr = *intPtr;
 
-        floatPtr++;
-        intPtr++;
+        ++floatPtr;
+        ++intPtr;
     }
 
     *floatPtr = '.';
-    floatPtr++;
+    ++floatPtr;
 
     T newValue = value - (int) value;
 
     for (u8 i = 0; i < decimalPlaces; i++) {
         newValue *= 10;
         *floatPtr = (char) newValue + '0';
-        floatPtr++;
+        ++floatPtr;
         newValue = newValue - (int) newValue;
     }
 
@@ -113,4 +113,4 @@ const char* floatToString(T value, u8 decimalPlaces) {
     return floatToStringOutput;
 }
 
-#endif //ROMAINOS_STRING_TPP
+#endif //ROMAINOS_STRINGROMAINOS_TPP
