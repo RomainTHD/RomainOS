@@ -1,28 +1,24 @@
 # RomainOS
 
-Une idée à la con mais vlà mon OS, from scratch, en 64 bits, à base d'assembleur et de C++ !
+Refonte intégrale !
 
-<img src="https://image.noelshack.com/fichiers/2016/24/1466366192-risitas8.png" alt="Hard" /> <br>
-<sub><i>My face when j'ai découvert que c'était compliqué l'assembleur lol</i></sub>
+Ici on va s'intéresser à de l'EFI fait maison.
 
-### Comment que c'est fait tout ça
+Du coup, c'est toujours une idée à la con, from scratch, en 64 bits, à base de C++, mais sans assembleur (ouf).
 
-Au moment du boot, le BIOS va load les 512 premiers bytes du disques (aka boot sector), définis dans <code>src/bootSector/bootloader.asm</code>.
+La version old-school legacy-BIOS est bien sûr toujours dispo dans une branche parallèle, d'ailleurs peut-être que je continuerai de la développer.
 
-Le bootloader, alors encore en "real-mode" 16-bits, va ensuite entrer en "protected-mode" 32-bits via <code>src/secondSector/extendedProgram.asm</code>.<br>
-La mémoire utilisable est listée, la ligne A20 est activée (pour éviter un wrap-around à 1 Mo), les interruptions sont désactivées,
-la RAM est structurée et un système de permissions basique est appliqué (tout en restant limitée à 4 Go).
+### Comment faire
 
-Puis le boot va continuer en mode 64-bits, gérant un affichage VGA 25x80.<br>
-Les informations du CPU sont accessibles, les long int (64 bits) sont activés, un paging de la RAM est effectué, et le GDT passe en 64 bits.
+Déjà, il nous faut un disque, en exécutant `dd if=/dev/zero of=drive.hdd bs=512 count=524288` (250 Mo, le minimum pour une partition FAT32).
 
-Après ça, les SSE sont activés pour utiliser les nombres flottants dans le kernel.
+Ensuite, monter le disque avec l'outil de votre choix (sinon [OSFMount](https://www.osforensics.com/tools/mount-disk-images.html) fera l'affaire),
+en lecture / écriture directe, émulation physique du disque, disque brut.
 
-Pour finir en assembleur, la méthode <code>_start</code> de <code>src/kernel.cpp</code> est appelée, chargeant le kernel C++ à proprement parler.
+Puis, depuis un gestionnaire de partitions, créer une table GPT (pas MBR, on est en UEFI maintenant), puis une partition FAT32.
 
-En C++ maintenant, le curseur est instancié, les interruptions clavier (IDT) initialisées, le layout du clavier set,
-et les régions utilisables en mémoire récupérées. 
+Depuis l'explorateur de fichiers, créer `EFI/Boot/` et y glisser le fichier `BOOTX64.EFI` (compilé justement dans ce projet).
 
-Et après tout ça, le noyau est ready !
+Puis, magie, VirtualBox en mode EFI et tout marche.
 
-<img src="https://image.noelshack.com/fichiers/2018/18/5/1525431412-macron2.png" alt="Ready" />
+(Vachement plus direct que via le BIOS wow).
