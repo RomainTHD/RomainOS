@@ -9,6 +9,6 @@ int main() {
         stdio::printChar(e.key);
     });
 
-    stdio::printString("Tout fonctionne !", "\n", stdio::BG_RED | stdio::FG_WHITE);
+    stdio::printString("Everything works fine !", "\n", stdio::BG_RED | stdio::FG_WHITE);
     return 0;
 }

@@ -1,41 +1,43 @@
-; Flip un bit, s'il reste identique alors CPUID est supporté
+; CPUID detection
+
+; Flips a bit, if the bit isn't changed then CPUID is supported
 detectCPUID:
-    ; Push flags dans le stack
+    ; Push flags to stack as a backup
     pushfd
     pop eax
 
     ; Backup eax
     mov ecx, eax
 
-    ; Flip un bit
+    ; Flip the bit
     xor eax, 1 << 21
 
-    ; Pop eax dans flags
+    ; Pop eax to the flags
     push eax
     popfd
 
     pushfd
     pop eax
 
-    ; Restore flags à ancienne version
+    ; Restore the flags to the old version
     push ecx
     popfd
 
-    ; Check différence
+    ; Check the difference
     xor eax, ecx
 
-    ; jmp if zero
+    ; Jump if zero
     jz noCPUID
 
     ret
 
-; No CPUID support
+; No CPUID support, can't continue
 noCPUID:
     hlt
 
-; Détection du long-mode pour 64-bits mode
+; Long-mode for 64-bits detection
 detectLongMode:
-    ; Gros nombre
+    ; Big number just to check
     mov eax, 0x80000001
     cpuid
     test edx, 1 << 29

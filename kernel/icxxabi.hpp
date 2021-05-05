@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 /**
- * Application binary interface
- * Fonctions définies par GCC pour certains cas bien précis
+ * Application Binary Interface
+ * Functions defined by GCC, like destructors
  */
 // Created by Romain on 06/10/2020.
 
@@ -9,24 +9,22 @@
 #define ROMAINOS_ICXXABI_HPP
 
 /**
- * Nombre max de fonctions at exit
+ * Max number of functions at exit
  */
 #define ATEXIT_MAX_FUNCS 128
 
 extern "C" {
-    typedef unsigned uarch_t;
-
     /**
-     * Entrée de __cxa_atexit
+     * Entry point of `__cxa_atexit`
      */
     struct atexit_func_entry_t {
         /**
-         * Destructeur
+         * Destructor
          */
         void (*destructor_func)(void*);
 
         /**
-         * Objet
+         * Current object
          */
         void* obj_ptr;
 
@@ -37,14 +35,17 @@ extern "C" {
     };
 
     /**
-     * Ajoute un destructeur
+     * Adds a destructor
+     * @param f Destructor
+     * @param objptr Current object
+     * @param dso DSO
+     * @return 0 if it went fine, else -1
      */
     int __cxa_atexit(void (*f)(void*), void* objptr, void* dso);
 
     /**
-     * Appelle un destructeur
-     *
-     * @param f Destructeur, les appelle tous si NULL
+     * Calls the destructor
+     * @param f Destructor, calls them all if NULL
      */
     void __cxa_finalize(void* f);
 }

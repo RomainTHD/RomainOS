@@ -6,14 +6,16 @@
 extern "C" {
     atexit_func_entry_t __atexit_funcs[ATEXIT_MAX_FUNCS];
 
-    uarch_t __atexit_func_count = 0;
+    unsigned __atexit_func_count = 0;
 
-    // TODO: Supprimer le '= 0' et le mettre dans la partie ASM
+    // TODO: Remove this `= 0` and put it inside the assembly ?
+    // FIXME: Use NULL instead
     void* __dso_handle = 0;
 
     int __cxa_atexit(void (*f)(void*), void* objptr, void* dso) {
         if (__atexit_func_count >= ATEXIT_MAX_FUNCS) {
-            // Si trop de destructeurs
+            // Too many destructors
+            // FIXME: Perhaps do something here ?
             return -1;
         }
 
@@ -26,14 +28,13 @@ extern "C" {
     }
 
     void __cxa_finalize(void* f) {
-        uarch_t i = __atexit_func_count;
+        unsigned i = __atexit_func_count;
 
         if (!f) {
             /*
-             * D'après la doc Itanium C++ ABI, si __cxa_finalize est appelée sans pointeur de fonction c'est que
-             * tout doit être détruit
-             *
-             * TODO: monitorer ici les liens encore existant aux DSO ?
+             * According to the Itanium C++ ABI documentation, if __cxa_finalize is called without function pointer
+             * everything must be removed
+             * TODO: monitor the links still belonging to the DSO ?
              */
 
             while (i != 0) {
@@ -52,18 +53,16 @@ extern "C" {
 
         while (i != 0) {
             /*
-             * Évidemment les destructeurs doivent pas être appelés plusieurs fois, un seul appel est nécessaire
-             *
-             * FIXME:
-             * Petit soucis, tous les destructeurs doivent être dans l'ordre, mais en retirer un créerait des trous.
-             * Doit être modifié pour déplacer les destructeurs et éviter les trous, qui représentent de l'espace gâché
+             * Obviously the destructors should only be called once
+             * FIXME: Problem, all the destructors have to be in the right order,
+             *        but removing some would introduce holes. Should be modified to move the destructors without holes,
+             *        it would be wasted space
              */
 
             if (__atexit_funcs[i].destructor_func == f) {
                 (*__atexit_funcs[i].destructor_func)(__atexit_funcs[i].obj_ptr);
                 __atexit_funcs[i].destructor_func = 0;
-
-                // On devrait ici décrémenter __atexit_func_count mais pour ça il faudrait fix le bug précédent...
+                // FIXME: We should decrement `__atexit_func_count` but we would have to fix the previous bug
             }
 
             i--;

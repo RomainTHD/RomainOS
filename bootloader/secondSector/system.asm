@@ -1,5 +1,8 @@
+; Some system, low-level stuff
+; x64
+
 GLOBAL _exit
-; Quitte l'OS
+; Exit the OS
 _exit:
     mov eax, 1
     mov ebx, 0
@@ -7,12 +10,12 @@ _exit:
     ret
 
 
-; Algorithme xorshift64*
-; Cf. https://gist.github.com/anonymous/1ea19a39644f2031fb82#file-t_random-asm
-; Cf. http://vigna.di.unimi.it/ftp/papers/xorshift.pdf
+; xorshift64* algorithm
+; @ßee https://gist.github.com/anonymous/1ea19a39644f2031fb82#file-t_random-asm
+; @see http://vigna.di.unimi.it/ftp/papers/xorshift.pdf
 
 SECTION .bss
-    ; Seed 64 bits
+    ; 64 bits seed
     seed resq 1
 
 SECTION .text
@@ -27,18 +30,18 @@ _srand:
     mov ecx, 0
 
     cpuid
-    ; Test si présence rdrand
+    ; Test if srand supported
     test ecx, 1 << 30
 
     jz noRdrand
 
-    mov ecx, 100 ; Nb essais
+    mov ecx, 100 ; Number of tries
     retry:
         rdrand eax
-        jc .done ; Carry flag set quand succès
+        jc .done ; Carry flag set when success
         loop retry
     .fail:
-        ; Pas de nb random available
+        ; No available random number
     .done:
     mov [seed], eax
     jmp exitSrand

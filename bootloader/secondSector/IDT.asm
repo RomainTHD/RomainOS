@@ -1,12 +1,14 @@
+; Interrupt Descriptor Table, x64 only
+
 [extern _idt]
 IDTDescriptor:
     ; 256 entries * 16 bytes
     dw 4095
 
-    ; IDT utilisé par le linker
+    ; IDT used by the linker
     dq _idt
 
-; Garde l'état des registres
+; Backup the registry state
 %macro PUSHALL 0
     push rax
     push rcx
@@ -17,7 +19,7 @@ IDTDescriptor:
     push r11
 %endmacro
 
-; Récupère l'état des registres
+; Load the regirstry state
 %macro POPALL 0
     pop r11
     pop r10
@@ -28,23 +30,24 @@ IDTDescriptor:
     pop rax
 %endmacro
 
+; Will be defined in the kernel
 [extern isr1Handler]
 
-; Rend isr1 global et donc utilisable par le kernel C++
+; isr1 is usable by the C++ kernel
 GLOBAL _isr1
-; Interrupt service routine 1, = keyboard
+; Interrupt service routine 1, == keyboard
 _isr1:
-    ; Pour maintenir l'état des registres
+    ; So we can keep the registry state
     PUSHALL
     call isr1Handler
     POPALL
-    ; Interrupt return quad (car 64 bits)
+    ; 64 bits so quad
     iretq
 
 GLOBAL _loadIDT
-; Charge les interruptions IDT
+; Loads the IDT interrupts
 _loadIDT:
     lidt [IDTDescriptor]
-    ; Active les interruptions IDT
+    ; Enable the IDT interrupts
     sti
     ret

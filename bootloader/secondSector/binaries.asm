@@ -1,4 +1,4 @@
-; Inclure les binaires
+; Includes binaries
 %macro incBin 2
     SECTION .rodata
     GLOBAL %1

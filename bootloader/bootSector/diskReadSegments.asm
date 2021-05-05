@@ -1,3 +1,3 @@
-; Fichier généré automatiquement.
-; La valeur est calculée selon l'espace occupé par le fichier binaire final.
+; AUTO-GENERATED FILE
+; This value is calculated using the final binary file size.
 mov al, 42

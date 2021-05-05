@@ -1,3 +1,7 @@
+"""
+Edits the linker
+"""
+
 import os
 
 if os.getcwd().replace('\\', '/').endswith("/scripts") or os.getcwd().replace('\\', '/').endswith("/scripts/"):

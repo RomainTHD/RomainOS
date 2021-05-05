@@ -12,18 +12,18 @@ DEPS   := $(SRCS:$(SRCDIR)/%.cpp=$(DEPDIR)/%.d)
 TREE   := $(patsubst %/,%,$(dir $(OBJS)))
 
 CPPFLAGS = -Ttext 0x8000 -ffreestanding -mno-red-zone -fno-exceptions -m64 -save-temps=obj -Wall -Wextra -pedantic -Wno-write-strings -std=c++1z -I ./libc/include
-# -Ttext 0x8000             Set la section .text à 0x8000, pour situer le main
-# -ffreestanding            La lib standard n'existe pas, et main n'est pas le point d'entrée
-# -mno-red-zone             Désactive la red-zone, 128 bytes sous le stack utilisés librement par gcc
-# -fno-exceptions           Désactive la génération de code pour les exceptions (vu qu'elles n'existent pas)
-# -m64                      Génère du code pour 64 bits
-# -save-temps=obj           Exporte les .cpp en assembleur dans le même dossier que les .o
-# -Wall                     Toutes les erreurs
-# -Wextra                   Extra erreurs
-# -pedantic                 Erreurs en plus
-# -Wno-write-strings        Disable les warnings pour l'utilisation de char* au lieu de std::string (std::string n'existe pas...)
-# -std=c++1z                C++ 17
-# -I ./libc/include         Dossier d'include pour les bibliothèques C/C++
+# -Ttext 0x8000             Sets the .text section to 0x8000 to locate the main
+# -ffreestanding            There's no standard library and main isn't the entry point
+# -mno-red-zone             Disable the red-zone, 128 bytes under the stack freely used by gcc
+# -fno-exceptions           Disable the code generation for C++ exceptions (because they don't exist, duh)
+# -m64                      Generate 64 bits code
+# -save-temps=obj           Exports the .cpp to assembly in the same directory as the .o
+# -Wall                     All warnings
+# -Wextra                   Extra warnings
+# -pedantic                 Even more warnings
+# -Wno-write-strings        Disable the warnings due to the use of `char*` instead of `std::string` (because it doesn't exist)
+# -std=c++1z                C++17
+# -I ./libc/include         Include directory for C/C++ libraries
 
 all: clean build run
 
@@ -36,11 +36,11 @@ clean:
 	mkdir ./bin/part
 
 compileAsm:
-	echo "Compilation bootloader..."
+	echo "Bootloader compilation..."
 	cd ./bootloader/bootSector && \
 	nasm ./bootloader.asm -f bin -o ../../bin/part/bootloader.bin -w+orphan-labels
 
-	echo "Compilation secteurs suivants..."
+	echo "Next sectors compilation..."
 	cd ./bootloader/secondSector && \
 	nasm ./extendedProgram.asm -f elf64 -i ../bootSector/ -o ../../obj/extendedProgram.o -w+orphan-labels  && \
 	nasm ./binaries.asm -f elf64 -o ../../obj/binaries.o -w+orphan-labels
@@ -48,7 +48,7 @@ compileAsm:
 compileCPP: _beforeCompilationCPP $(OBJS) _afterCompilationCPP
 
 _beforeCompilationCPP:
-	echo "Compilation C/C++..."
+	echo "C/C++ compilation..."
 
 .SECONDEXPANSION:
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp | $$(@D)
@@ -66,18 +66,18 @@ link:
 	$(LINKER_PATH) -T "./scripts/linker.ld"
 
 merge:
-	echo "Fusion des fichiers binaires..."
+	echo "Binary files merge..."
 	cat ./bin/part/bootloader.bin ./bin/part/kernel.bin > ./bin/OS/RomainOS.bin
 
 calcNbSeg:
-	echo "; Fichier généré automatiquement." > ./bootloader/bootSector/diskReadSegments.asm
-	echo "; La valeur est calculée selon l'espace occupé par le fichier binaire final." >> ./bootloader/bootSector/diskReadSegments.asm
+	echo "; AUTO-GENERATED FILE" > ./bootloader/bootSector/diskReadSegments.asm
+	echo "; This value is calculated using the final binary file size." >> ./bootloader/bootSector/diskReadSegments.asm
 	nbSeg=$$(($$(wc -c < ./bin/OS/RomainOS.bin)/512)) && \
-	echo "Nombre de segments nécessaires: $$nbSeg" && \
+	echo "Number of necessary segments : $$nbSeg" && \
 	echo "mov al," $$nbSeg >> ./bootloader/bootSector/diskReadSegments.asm
 
 run:
-	echo "Exécution bootloader..."
+	echo "Bootloader execution..."
 	qemu-system-x86_64 -drive format=raw,file=./bin/OS/RomainOS.bin --no-reboot
 
 iso: build

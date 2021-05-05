@@ -1,3 +1,5 @@
+; After the boot sector, the extended program (protected mode, 64 bits...)
+
 jmp enterProtectedMode
 
 %include "time.asm"
@@ -5,33 +7,33 @@ jmp enterProtectedMode
 %include "printString.asm"
 %include "memory.asm"
 
-; Passage au mode protégé, qui offre 4 Go de RAM, pas de segmentation de RAM,
-; de la détection d'adresses invalides et des priorités de tâches (pour le kernel plus tard)
+; Protected mode offering 4 GB of RAM, no segmentation, invalid addresses detection
+; and task priorities (will be used later by the kernel)
 enterProtectedMode:
     call detectMemory
     call enableA20
 
-    ; Désactive les interruptions système
+    ; Disable the system interrupts, we don't need them anymore
     cli
 
     ; Load GDT
     lgdt [gdt_descriptor]
 
-    ; Set un bit 0 pour indiquer protected mode
+    ; Clears a bit to indicate protected mode
     mov eax, cr0
     bts eax, 0
     mov cr0, eax
 
     jmp codeSegment:startProtectedMode
 
-; Legacy stuff pour activer les lignes d'adresse A20 à A32 pour la RAM
-; Cf. http://www.independent-software.com/operating-system-development-enabling-a20-line.html
+; Legacy stuff to activate the A20 to A32 RAM address lines
+; @see http://www.independent-software.com/operating-system-development-enabling-a20-line.html
 enableA20:
-    ; On prend un truc en entrée
+    ; No idea why
     in al, 0x92
-    ; Set le bit 1
+    ; Sets the bit to 1
     or al, 2
-    ; On set ce truc en sortie
+    ; No idea why either, but it works
     out 0x92, al
     ret
 
@@ -40,7 +42,7 @@ enableA20:
 %include "CPUID.asm"
 %include "paging.asm"
 
-; Flush le pipeline du CPU pour éviter d'exécuter une instruction en parallèle au changement vers 32 bits
+; Flush the CPU pipeline to avoid executing a parallel instruction while migrating to 32 bits
 startProtectedMode:
     mov ax, dataSegment
     mov ds, ax
@@ -49,7 +51,7 @@ startProtectedMode:
     mov fs, ax
     mov gs, ax
 
-    ; Décale le stack là où y aura bien plus de place et où ça gênera pas
+    ; Moves the stack where there's way more room
     mov ebp, 0x90000
     mov esp, ebp
 
@@ -61,7 +63,7 @@ startProtectedMode:
     jmp codeSegment:start64Bits
 
 [bits 64]
-; Fonction C
+; C function
 [extern _start]
 
 %include "IDT.asm"
@@ -71,32 +73,33 @@ start64Bits:
     ; VRAM
     mov edi, 0xb8000
 
-    ; Registre 64 bits seulement
-    ; 4 espaces, bg = 1 = white, fg = f = white
+    ; 64 bits registry only
+    ; 4 spages, bg == 1 == white, fg == f == white
     ; Clear screen
     mov rax, 0x1f201f201f201f20
 
-    ; Lignes
+    ; Lines
     mov ecx, 500
 
     rep stosq
 
     call activateSSE
 
+    ; NOTE: Should be overridden after calling _srand, if supported
     mov rcx, 1234567890
     mov [seed], rcx
     call _srand
 
-    ; Fonction C
+    ; C function, kernel start
     call _start
 
-    ; Boucle infinie, fin
+    ; End of our kernel execution
     jmp $
 
-; Active les Streaming SIMD Extensions (SSE)
-; Opérations sur floating point (maths + comparaisons), cast de double / float ou vers double / float
+; Enables the Streaming SIMD Extensions (SSE)
+; Allows operations on floating point like math, comparisons and cast (from double / float or to double / float)
 activateSSE:
-    ; Set le dernier bit et unset l'avant dernier de cr0
+    ; Set the last bit and unset the penultimate one of cr0
     ; Bit 6 (unsed) : coprocessor emulation
     ; Bit 7 (set) : coprocessor monitoring
     mov rax, cr0
@@ -104,11 +107,12 @@ activateSSE:
     bts ax, 0
     mov cr0, rax
 
-    ; Set les bits 0 et 1 de cr4
+    ; Set the 2 first bits of cr4
     mov rax, cr4
     or ax, 0b1100000000
     mov cr4, rax
 
     ret
 
+; To keep a round number of bytes
 times 2048-($-$$) db 0

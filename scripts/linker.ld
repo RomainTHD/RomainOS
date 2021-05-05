@@ -18,7 +18,8 @@ INPUT (
     ./obj/libc/stdio/rawIO.o
     ./obj/libc/stdlib/memory.o
     ./obj/libc/stdlib/memoryMap.o
-    ./obj/libc/string/string.o
+    ./obj/libc/string/stringC.o
+    ./obj/libc/string/stringClass.o
     ./obj/programs/textEditor/textEditor.o
 )
 
@@ -27,7 +28,7 @@ OUTPUT (
 )
 
 SECTIONS {
-    /* Début des sections */
+    /* Section start */
     . = 0x8000;
 
     .text : ALIGN(0x1000) {
@@ -35,10 +36,10 @@ SECTIONS {
         *(.rodata*)
     }
 
-    /* Pour les interruptions */
+    /* Interrupts */
     .idt BLOCK(0x1000) : ALIGN(0x1000) {
         _idt = .;
-        /* On réserve au moins 4096 bytes */
+        /* At least 4096 bytes reserved */
         . = . + 0x1000;
     }
 

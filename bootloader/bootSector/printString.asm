@@ -1,23 +1,26 @@
-; Affiche une chaine de caractères terminée par '\0'
+; Prints the string
+; 16 bits-only I think ? Because BIOS only
+
+; Outputs a string ending with '\0'
 printStringBIOS:
     push ax
     push bx
 
-    ; BIOS set en mode TTY
+    ; BIOS set to TTY mode
     mov ah, 0x0e
 
     .loopPrintString:
 
-    ; Comparaison de bx et de \0
+    ; Compare bx and `\0`
     cmp [bx], byte 0
 
-    ; Check le flag d'égalité, si == alors jmp exitPrintString
+    ; Checks equality flag, and jump to exitPrintString if equals
     je .exitPrintString
-        ; Registre d'écriture
+        ; Write registry
         mov al, [bx]
-        ; Interruption BIOS pour écrire le contenu de al
+        ; BIOS interrupt to write the content of al
         int 0x10
-        ; Incrémente bx pour passer au caractère suivant
+        ; Increments bx to compare next character
         inc bx
         jmp .loopPrintString
     .exitPrintString:

@@ -1,34 +1,37 @@
+; RAM
+; 16 bits if I remember well
+
 GLOBAL _memoryRegionCount
 _memoryRegionCount:
     db 0
 
 detectMemory:
-    ; Set ES et DI à la destination d'où stocker la table
+    ; Set ES and DI to the destination where we want to store the table
     mov ax, 0
     mov es, ax
-    mov di, 0x5000 ; Destination au pif
-    mov edx, 0x534d4150 ; "SMAP" en ASCII
-    xor ebx, ebx ; Set à 0, on aurait aussi pu faire "mov ebx, 0" mais c'est pas drôle ahah
+    mov di, 0x5000 ; Whatever destination you want
+    mov edx, 0x534d4150 ; "SMAP" in ASCII
+    xor ebx, ebx ; Sets to 0, yea we could use "mov ebx, 0" but it's less fun
 
-    ; Loop, on va parcourir le listing de la table et sauvegarder la RAM via le BIOS
+    ; We're going to save the RAM using the BIOS looping through the table listing
     .loopMemory:
-        ; Pour setup l'interruption
+        ; Interruption setup
         mov eax, 0xe820
 
-        ; Taille de 8 memory listing, pour le BIOS, ça marche c'est magique
+        ; 8 memory listing, for the BIOS, idk why it works but trials and errors
         mov ecx, 24
 
-        ; Sauvegarde le memory listing dans notre table
+        ; Save the memory listing in our table
         int 0x15
 
-        ; Fin ou non du listing
+        ; End of the listing or not
         cmp ebx, 0
         je .finishedLoopMemory
 
-        ; Incrémente le destination index
+        ; Increments the destination index
         add di, 24
 
-        ; Nouveau listing
+        ; New listing
         inc byte [_memoryRegionCount]
 
         jmp .loopMemory

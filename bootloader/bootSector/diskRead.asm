@@ -1,36 +1,42 @@
-; 512 bytes apres 0x7c00
+; Disk utilities and stuff
+; 16 bits only
+
+; 512 bytes after 0x7c00
 PROGRAM_SPACE equ 0x8000
 
+; Reads the disk
 readDisk:
-    ; Configure le BIOS pour lire le disque
+    ; Configure BIOS to read the disk
     mov ah, 0x02
 
-    ; Pour que le BIOS sache où mettre la data en mémoire
+    ; So the BIOS know where to load data in mémoire
     mov bx, PROGRAM_SPACE
 
-    ; Nombre de secteurs de 512 bytes du disque
-    ; %include "diskReadSegments.asm"
+    ; Number of 512 bytes sectors on the disk
+    ; TODO: %include "diskReadSegments.asm"
     mov al, 127
 
-    ; Quel disque choisir
+    ; Which disk to choose
     mov dl, [BOOT_DISK]
 
-    ; Cylindre num 0 (hard drive)
+    ; Cylinder number 0 (hard drive)
     mov ch, 0x00
 
-    ; Head num 0 (hard drive)
+    ; Head number 0 (hard drive)
     mov dh, 0x00
 
-    ; Lecture à partir du 2e secteur, le 1er étant le boot sector
+    ; Starts reading at the 2nd secteur (the 1st one being the boot sector)
     mov cl, 0x02
 
+    ; Main reading loop
     diskReadLoop:
+        ; FIXME: Shouldn't we push and pop ?
         ; push ax
         ; push bx
         ; push cx
         ; push dx
 
-        ; Interruption BIOS pour lire
+        ; BIOS interrupt to read
         int 0x13
 
         ; pop dx
@@ -38,23 +44,22 @@ readDisk:
         ; pop bx
         ; pop ax
 
-        ; Bon, l'avenir nous dira si ce code était une erreur ou non...
-        ; Jmp if carry set (= erreur disque)
+        ; Jump if carry set, if there's an error on the disk
         jc diskReadExit
-        ; Autre possibilité:
-        ; jc diskReadError
+        ; FIXME: why not `jc diskReadError` ?
 
-        ; Écriture des 512 bytes suivants
+        ; Writes the next 512 bytes
         add bx, 512
-        ; Lecture secteur suivant
+        ; Reads the next sector
         inc cx
 
-         ; limite de 255 secteurs
+        ; Hard limit of 255 sectors
         cmp cl, 255
         je diskReadExit
 
         jmp diskReadLoop
 
+    ; Exit loop
     diskReadExit:
         ; pop dx
         ; pop cx
@@ -69,7 +74,7 @@ diskReadErrorString:
 diskReadError:
     mov bx, diskReadErrorString
     call printStringBIOS
-    ; Boucle infinie parce que erreur de toute façon
+    ; Infinite loop but we don't really care here, the failure is unrecoverable
     jmp $
 
 BOOT_DISK:
