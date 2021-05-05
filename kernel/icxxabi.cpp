@@ -22,7 +22,7 @@ extern "C" {
         __atexit_funcs[__atexit_func_count].destructor_func = f;
         __atexit_funcs[__atexit_func_count].obj_ptr = objptr;
         __atexit_funcs[__atexit_func_count].dso_handle = dso;
-        __atexit_func_count++;
+        ++__atexit_func_count;
 
         return 0;
     }
@@ -45,7 +45,7 @@ extern "C" {
                     (*__atexit_funcs[i].destructor_func)(__atexit_funcs[i].obj_ptr);
                 }
 
-                i--;
+                --i;
             }
 
             return;
@@ -65,7 +65,7 @@ extern "C" {
                 // FIXME: We should decrement `__atexit_func_count` but we would have to fix the previous bug
             }
 
-            i--;
+            --i;
         }
     }
 }

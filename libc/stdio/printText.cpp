@@ -73,7 +73,7 @@ namespace stdio {
                 u8 i = 0;
                 do {
                     printChar(' ');
-                    i++;
+                    ++i;
                 } while (i <= (u8) (getCursorPosition() % VGA_WIDTH) % TAB_LENGTH);
             }
                 break;
@@ -132,14 +132,14 @@ namespace stdio {
 
             while (*charPtr != '\0') {
                 printChar(*charPtr, color);
-                charPtr++;
+                ++charPtr;
             }
 
             if (end != nullptr) {
                 charPtr = (byte *) end;
                 while (*charPtr != '\0') {
                     printChar(*charPtr, color);
-                    charPtr++;
+                    ++charPtr;
                 }
             }
         }
