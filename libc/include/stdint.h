@@ -98,6 +98,6 @@ typedef uint8_t byte;
 /**
  * Size. 32 bits
  */
-typedef uint32_t size_t;
+typedef unsigned long long size_t;
 
 #endif //ROMAINOS_STDINT_H
