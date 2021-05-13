@@ -7,8 +7,7 @@
 namespace stdlib {
     namespace {
         /**
-         * Combine deux segments libres et évite la fragmentation
-         *
+         * Merge two free segments and avoids segmentation
          * @param segA Segment A
          * @param segB Segment B
          */
@@ -29,8 +28,7 @@ namespace stdlib {
                 segB->nextSegment->prevSegment = segA;
                 segB->nextSegment->prevFreeSegment = segA;
                 segB->nextFreeSegment->prevFreeSegment = segA;
-            }
-            else {
+            } else {
                 segB->length += segA->length + sizeof(MemorySegmentHeader);
                 segB->nextSegment = segA->nextSegment;
                 segB->nextFreeSegment = segA->nextFreeSegment;
@@ -42,7 +40,7 @@ namespace stdlib {
         }
 
         /**
-         * 1er segment
+         * 1st segment
          */
         MemorySegmentHeader* _firstFreeSegment;
     }
@@ -58,7 +56,7 @@ namespace stdlib {
     }
 
     void* malloc(size_t size) {
-        // Alignement de la RAM, utile pour meilleures performances sur hardware 64 bits
+        // RAM alignment, useful for better performances on 64 bits hardware
 
         u64 remainder = size % 8;
         size -= remainder;
@@ -71,12 +69,12 @@ namespace stdlib {
 
         while (true) {
             if (currentMemorySegment->length >= size) {
-                // On a trouvé un segment libre
+                // Free segment found
 
                 if (currentMemorySegment->length > size + sizeof(MemorySegmentHeader)) {
-                    // On va split le segment pour n'allouer que ce qu'il faut
+                    // Split the segment to allocate only what is needed
 
-                    MemorySegmentHeader* newSegment = (MemorySegmentHeader*) ((u64) currentMemorySegment + sizeof(MemorySegmentHeader) + size);
+                    auto* newSegment = (MemorySegmentHeader*) ((u64) currentMemorySegment + sizeof(MemorySegmentHeader) + size);
                     newSegment->isFree = true;
                     newSegment->length = (u64) currentMemorySegment->length - (sizeof(MemorySegmentHeader) + size);
                     newSegment->nextSegment = currentMemorySegment->nextSegment;
@@ -89,20 +87,20 @@ namespace stdlib {
                     currentMemorySegment->length = size;
                 }
 
+                // Special case when 1st segment
                 if (currentMemorySegment == _firstFreeSegment) {
-                    // Cas spécial quand 1er segment
                     _firstFreeSegment = currentMemorySegment->nextFreeSegment;
                 }
 
                 currentMemorySegment->isFree = false;
 
+                // Change free segments inside the linked list
+
                 if (currentMemorySegment->prevFreeSegment != nullptr) {
-                    // Changement des segments libres de la liste chainée
                     currentMemorySegment->prevFreeSegment->nextFreeSegment = currentMemorySegment->nextFreeSegment;
                 }
 
                 if (currentMemorySegment->nextFreeSegment != nullptr) {
-                    // Changement des segments libres de la liste chainée
                     currentMemorySegment->nextFreeSegment->prevFreeSegment = currentMemorySegment->prevFreeSegment;
                 }
 
@@ -117,8 +115,8 @@ namespace stdlib {
                 return currentMemorySegment + 1;
             }
 
+            // No more available memory. Shouldn't happen, but if it happens we should do additional paging
             if (currentMemorySegment->nextFreeSegment == nullptr) {
-                // Plus de mémoire restante. Normalement impossible, si on arrive ici on doit refaire du paging
                 return nullptr;
             }
 
@@ -130,7 +128,7 @@ namespace stdlib {
         return memset<byte>(ptr, value, nb);
     }
 
-    void* calloc(size_t nb, size_t size) {
+    [[maybe_unused]] void* calloc(size_t nb, size_t size) {
         return memset(malloc(nb*size), 0, nb);
     }
 
@@ -149,15 +147,15 @@ namespace stdlib {
         }
 
         if (currentMemorySegment->prevFreeSegment != nullptr) {
-            if (currentMemorySegment->prevFreeSegment->nextFreeSegment > currentMemorySegment)
+            if (currentMemorySegment->prevFreeSegment->nextFreeSegment > currentMemorySegment) {
                 currentMemorySegment->prevFreeSegment->nextFreeSegment = currentMemorySegment;
+            }
         }
 
         if (currentMemorySegment->nextSegment != nullptr) {
             currentMemorySegment->nextSegment->prevSegment = currentMemorySegment;
-
             if (currentMemorySegment->nextSegment->isFree) {
-                // Évite la fragmentation
+                // Avoids fragmentation
                 combineFreeSegments(currentMemorySegment, currentMemorySegment->nextSegment);
             }
         }
@@ -165,15 +163,17 @@ namespace stdlib {
         if (currentMemorySegment->prevSegment != nullptr) {
             currentMemorySegment->prevSegment->nextSegment = currentMemorySegment;
             if (currentMemorySegment->prevSegment->isFree) {
-                // Évite la fragmentation
+                // Avoids fragmentation
                 combineFreeSegments(currentMemorySegment, currentMemorySegment->prevSegment);
             }
         }
     }
 
     void* realloc(_Inout_ void* ptr, size_t size) {
+        void* newPtr = malloc(size);
+        memcpy<byte>(newPtr, ptr, size);
         free(ptr);
-        return malloc(size);
+        return newPtr;
     }
 
     void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length) {
