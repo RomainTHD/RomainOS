@@ -1,198 +1,186 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
+/**
+ * Memory
+ */
 // Created by Romain on 18/09/2020.
 
 #ifndef ROMAINOS_MEMORY_H
 #define ROMAINOS_MEMORY_H
 
 #include <cstdint>
+#include <SAL.h>
 
 namespace stdlib {
     /**
-     * Segment RAM (liste chaînée)
+     * RAM segment (linked list)
      */
     struct MemorySegmentHeader {
         /**
-         * Taille
+         * Length
          */
         u64 length;
 
         /**
-         * Segment suivant
+         * Next segment
          */
         MemorySegmentHeader* nextSegment;
 
         /**
-         * Segment précédent
+         * Previous segment
          */
         MemorySegmentHeader* prevSegment;
 
         /**
-         * Segment libre suivant
+         * Next free segment
          */
         MemorySegmentHeader* nextFreeSegment;
 
         /**
-         * Segment libre précédent
+         * Previous free segment
          */
         MemorySegmentHeader* prevFreeSegment;
 
         /**
-         * Segment libre ou non
+         * Free segment or not
          */
         bool isFree;
     };
 
     /**
-     * Initialise la RAM en allouant un segment XXL qui sera ensuite découpé plus tard
-     *
-     * @param heapAddress Adresse du segment
-     * @param heapLength Taille du segment
+     * Initialize the RAM by allocating a big chunk of RAM which will later be split in smaller chunks
+     * @param heapAddress Segment address
+     * @param heapLength Segment size
      */
     void initHeap(u64 heapAddress, u64 heapLength);
 
     /**
-     * Alloue de la mémoire.
-     * On est honnêtement pas sur la meilleure implémentation qui existe,
-     * y a beaucoup de données inutiles pour des petites allocations à cause des infos sur les MemorySegmentHeader qu'on
-     * doit bien stocker quelque part, mais ça fait le taf c'est ce qui compte.
-     *
-     * @param size Taille
-     *
-     * @return Pointeur
+     * Allocate memory. Not the best implementation, it has a lot of overhead because of the MemorySegmentHeader,
+     * especially for small allocations, but it works.
+     * @param size Allocation size
+     * @return Memory pointer
      */
-    void* malloc(size_t size);
+    _Nullable void* malloc(size_t size);
 
     /**
-     * Set un tableau et le modifie
-     *
-     * @tparam T Type d'une case
-     * @param ptr Pointeur
-     * @param value Valeur
-     * @param nb Nombre de cases à set
-     *
-     * @return Tableau
+     * Sets an array and modify it
+     * @tparam T Cell type
+     * @param ptr Array pointer
+     * @param value Value
+     * @param nb Number of cells to set
+     * @return Array
      */
     template<typename T>
     T* memset(_Out_ void* ptr, T value, size_t nb);
 
     /**
-     * Set un tableau et le modifie
-     *
-     * @param ptr Pointeur
-     * @param value Valeur
-     * @param nb Nombre de cases à set
-     *
-     * @return Tableau
+     * Sets an array and modify it, byte by byte
+     * @param ptr Array pointer
+     * @param value Value
+     * @param nb Number of cells to set
+     * @return Array
      */
     void* memset(_Out_ void* ptr, int value, size_t nb);
 
     /**
-     * Mémoire initialisée à 0
-     *
-     * @param nb Nombre d'objets
-     * @param size Taille d'un objet
-     *
-     * @return Pointeur
+     * Like `malloc` but initialize to zero.
+     * @param nb Number of objects
+     * @param size Object size
+     * @return Memory pointer
      */
     void* calloc(size_t nb, size_t size = sizeof(byte));
 
     /**
-     * Tableau initialisé à 0
-     *
-     * @tparam T Type
-     * @param nb Nombre de cases
-     *
-     * @return Pointeur
+     * Like `malloc` but initialize to zero. Used to allocate an array of `T`.
+     * @tparam T Cell type
+     * @param nb Number of cells
+     * @return Memory pointer
      */
     template<typename T>
     T* calloc(size_t nb);
 
     /**
-     * Libère de la mémoire
-     *
-     * @param ptr Pointeur
+     * Frees memory
+     * @param ptr Pointer
      */
     void free(_Out_ void* ptr);
 
     /**
-     * Réalloue de la mémoire
-     *
-     * @param ptr Pointeur
-     * @param size Nouvelle taille
-     *
-     * @return Nouveau pointeur
+     * Reallocate memory
+     * @param ptr Pointer
+     * @param size New size
+     * @return New pointer
      */
     void* realloc(_Inout_ void* ptr, size_t size);
 
     /**
-     * Copie deux emplacements mémoire
-     *
+     * Makes a copy of an array of bytes
      * @param dest Destination
      * @param src Source
-     * @param length Nombre d'octets
+     * @param length Number of bytes
      */
     void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length);
 
     /**
-     * Copie deux emplacements mémoire
-     *
-     * @tparam T Type d'élément
+     * Makes a copy of an array of cells`
+     * @tparam T Cell type
      * @param dest Destination
      * @param src Source
-     * @param length Nombre d'éléments
+     * @param length Number of cells
      */
     template <typename T>
     void* memcpy(_Out_ void* dest, _In_ const void* src, size_t length);
 }
 
+/**
+ * Malloc
+ * @see stdlib::malloc
+ */
 constexpr auto malloc = stdlib::malloc;
+
+/**
+ * Free
+ * @see stdlib::free
+ */
 constexpr auto free = stdlib::free;
 
 /**
- * Opérateur new
- *
- * @param size Taille
- *
- * @return Pointeur objet
+ * `new` operator
+ * @param size Size
+ * @return Object pointer
  */
 void* operator new(size_t size);
 
 /**
- * Opérateur new[]
- *
- * @param size Taille
- *
- * @return Pointeur array
+ * `new[]` operator
+ * @param size Size
+ * @return Array pointer
+
  */
 void* operator new[](size_t size);
 
 /**
- * Opérateur delete
- *
- * @param p Pointeur
+ * `delete` operator
+ * @param p Pointer
  */
 void operator delete(void* p) noexcept;
 
 /**
- * Opérateur delete
- *
- * @param p Pointeur
- * @param size Taille
+ * `delete` operator
+ * @param p Pointer
+ * @param size Size
  */
 void operator delete(void* p, size_t size __attribute__((unused))) noexcept;
 
 /**
- * Opérateur delete[]
- *
- * @param p Pointeur
+ * `delete[]` operator
+ * @param p Pointer
  */
 void operator delete[](void* p) noexcept;
 
 /**
- * Opérateur delete[]
- *
- * @param p Pointeur
- * @param size Taille
+ * `delete[]` operator
+ * @param p Pointer
+ * @param size Size
  */
 void operator delete[](void* p, size_t size __attribute__((unused))) noexcept;
 
